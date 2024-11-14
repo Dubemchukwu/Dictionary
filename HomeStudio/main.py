@@ -244,12 +244,11 @@ class Home:
             self.__complete_text = word.lower()
             cout(word.lower())
             # e.control.select_range(len(e.data), len(word))
-
         e.page.update()
         e.control.update()
 
     def __search_word(self, e: ControlEvent):
-        saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
+        saving = threading.Timer(interval=5, function=Variable().create_history, kwargs={"wordz": e.data})
         saving.start()
 
         e.page.views[1].controls[0].content.content.controls[3].controls = [
