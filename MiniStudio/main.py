@@ -6,6 +6,7 @@ cout = icecream.ic
 
 
 class UI:
+
     def __init__(self, screen):
         self.screen = screen
         self.duration = 1000
@@ -25,7 +26,7 @@ class UI:
             self.__ui(),
         )
         self.screen.window.on_event = self.__window_event
-        screen.update()
+        self.screen.update()
 
     def __window_event(self, e: WindowEvent):
         if e.data == "blur":
@@ -86,7 +87,7 @@ class UI:
         )
 
     def __ui(self):
-        return View(
+        _ = View(
             route="/",
             bgcolor=colors.TRANSPARENT,
             padding=0, spacing=0,
@@ -96,3 +97,4 @@ class UI:
                 self.__original(),
             ],
         )
+        return _

@@ -5,7 +5,18 @@ from flet import *
 import time
 from icecream import ic as cout
 import threading
+
 english_words = set(words.words())
+
+
+class ApiCont:
+    def __init__(self):
+        self.word = "Naive"
+        self.PAS = "adjective"
+        self.meaning = "Showing a lack of experience, wisdom or judgement."
+
+    def daily_word_gen(self):
+        self.__daily_word = random.choice(words.words())
 
 
 class Variable:
@@ -15,13 +26,34 @@ class Variable:
         self.main_list = []
         self.remainder_list = []
 
+    def refresh_all(self, e: ControlEvent):
+        e.control.rotate = e.control.rotate + math.pi * 2
+        e.control.update()
+
+    def _refreshing_all(self, e: ControlEvent):
+        e.page.views[1].controls[0].content = None
+        e.page.views[1].controls[0].content = Home()._content_()
+        e.page.views[1].controls[0].update()
+        cout("refreshed")
+
     def create_history(self, wordz):
         with open("recent.rec", "a") as recent:
-            recent.write(wordz+",")
+            recent.write(wordz + ",")
 
     def list_history(self):
+        self.checking = 0
         with open("recent.rec", "r") as recent:
-            cout(recent.read())
+            wordz = recent.read()[:-1]
+            wordz = wordz.split(",")
+
+            for word in reversed(wordz):
+                if self.checking <= 3:
+                    self.main_list.append(word)
+                else:
+                    self.remainder_list.append(word)
+                self.checking += 1
+
+        return [self.main_list, self.remainder_list]
 
 
 class daily_word:
@@ -55,6 +87,8 @@ class daily_word:
 
     def _build(self):
         return Container(
+            margin=margin.only(top=0),
+            alignment=alignment.top_center,
             content=Stack(
                 controls=[
                     Image(
@@ -203,9 +237,11 @@ class history(Container):
                         size=13,
                         color="#434343",
                     ),
+                    # on_click=lambda e: se
                 ),
                 IconButton(
                     icon=icons.CANCEL_OUTLINED,
+                    data=text_,
                     on_click=lambda e: self.__delete(e),
                     icon_color="#1b1b1b",
                     icon_size=15,
@@ -218,7 +254,17 @@ class history(Container):
         self.bgcolor = "#d9d9d9"
 
     def __delete(self, e: ControlEvent):
-        print("deleted successfully")
+        with open("recent.rec", "r") as file:
+            file_data = file.read()
+            file_data = file_data.replace(e.control.data + ",", "")
+
+        with open("recent.rec", "w") as file:
+            file.write(file_data)
+            cout(file_data)
+
+        self.visible = False
+        self.update()
+        cout("deleted successfully")
 
 
 class Home:
@@ -248,7 +294,7 @@ class Home:
         e.control.update()
 
     def __search_word(self, e: ControlEvent):
-        saving = threading.Timer(interval=5, function=Variable().create_history, kwargs={"wordz": e.data})
+        saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
         saving.start()
 
         e.page.views[1].controls[0].content.content.controls[3].controls = [
@@ -266,50 +312,82 @@ class Home:
     def _add_history(self, array):
         controls = []
         for word_ in array:
-            self.__history_ = history(word_)
-            controls.append(self.__history_)
+            if len(word_) == 0:
+                pass
+            else:
+                self.__history_ = history(word_)
+                controls.append(self.__history_)
 
         return controls
 
     def __expand_hist(self, e: ControlEvent):
-        e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].controls.extend(
-            self._add_history(
+        if e.control.text == "see all":
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].height = (38 * 2)
 
-            ))
-        Variable.see_all_state = True
-        print(e.data, "clicked")
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].controls.extend(
+                self._add_history(
+                    Variable().list_history()[1],
+                ))
+            Variable.see_all_state = True
+            e.control.text = "Shrink"
+
+        else:
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].expand = False
+
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].height = 38
+
+            e.control.text = "see all"
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].controls = self._add_history(
+                Variable().list_history()[0],
+            )
+            Variable.see_all_state = False
+
+        cout(len(e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                     2].controls))
+
+        cout(e.data, "clicked")
+        e.control.update()
+        e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
         cout(Variable.see_all_state)
 
     def __content_home(self):
         return Column(
-            alignment=MainAxisAlignment.SPACE_BETWEEN,
-            height=460,
+            alignment=MainAxisAlignment.SPACE_EVENLY,
+            spacing=0, run_spacing=0, tight=True,
+            height=430,
             controls=[
                 Container(
-                    height=100,
                     padding=padding.only(left=10, top=10),
                     content=Column(
                         alignment=MainAxisAlignment.SPACE_EVENLY,
-                        spacing=10,
-                        height=100,
+                        spacing=0, run_spacing=0, tight=True,
+                        # height=100,
                         controls=[
                             Text("Recently Searched", size=15, color="#808080"),
                             TransparentPointer(height=10),
                             GridView(
+                                animate_size=animation.Animation(750,
+                                                                 AnimationCurve.FAST_LINEAR_TO_SLOW_EASE_IN),
                                 child_aspect_ratio=3.55, runs_count=4,
                                 horizontal=False,
                                 # alignment=MainAxisAlignment.START,
                                 # scroll=ScrollMode.AUTO,
                                 # auto_scroll=True,
-                                width=460, height=38,
+                                width=460,
                                 # vertical_alignment=CrossAxisAlignment.CENTER,
-                                controls=self._add_history(["country", "tandem", "array",
-                                                            "dictionary"]),
+                                controls=self._add_history(Variable().list_history()[0]),
                             ),
                             Row(
                                 alignment=MainAxisAlignment.END,
+                                spacing=0, run_spacing=0,
                                 controls=[
                                     TextButton(
+                                        height=40,
                                         text="see all",
                                         on_click=lambda e: self.__expand_hist(e),
                                         style=ButtonStyle(
@@ -327,44 +405,8 @@ class Home:
                         ],
                     ),
                 ),
-                TransparentPointer(height=25),
                 daily_word()._build(),
-                TransparentPointer(height=60),
-                Row(
-                    alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        Text(
-                            spans=[
-                                TextSpan(
-                                    text="©",
-                                    style=TextStyle(
-                                        weight=FontWeight.W_500, color=colors.BLACK,
-                                        size=17,
-                                        shadow=BoxShadow(spread_radius=8, blur_radius=1,
-                                                         blur_style=ShadowBlurStyle.OUTER,
-                                                         color=colors.with_opacity(0.75,
-                                                                                   colors.BLACK),
-                                                         offset=(0, .0023),
-                                                         ),
-                                    ),
-                                ),
-                                TextSpan(
-                                    text="NH-CEN Group4 PROJECT",
-                                    style=TextStyle(
-                                        weight=FontWeight.W_500, color=colors.BLACK,
-                                        size=12,
-                                        shadow=BoxShadow(spread_radius=8, blur_radius=1,
-                                                         blur_style=ShadowBlurStyle.OUTER,
-                                                         color=colors.with_opacity(0.75,
-                                                                                   colors.BLACK),
-                                                         offset=(0, .0023),
-                                                         ),
-                                    ),
-                                )
-                            ],
-                        ),
-                    ],
-                ),
+                TransparentPointer(height=60)
             ],
         )
 
@@ -410,11 +452,23 @@ class Home:
                                 controls=[
                                     IconButton(
                                         icon=icons.REFRESH_ROUNDED,
+                                        rotate=0,
+                                        style=ButtonStyle(
+                                            overlay_color={ControlState.DEFAULT: colors.BLACK12},
+                                        ),
+                                        animate_rotation=animation.Animation(
+                                            1500,
+                                            AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
+                                        on_click=lambda e: Variable().refresh_all(e),
+                                        on_animation_end=lambda e: Variable()._refreshing_all(e),
                                         icon_size=30,
                                         icon_color=colors.BLACK,
                                     ),
                                     IconButton(
                                         icon=icons.MORE_HORIZ_ROUNDED,
+                                        style=ButtonStyle(
+                                            overlay_color={ControlState.DEFAULT: colors.BLACK12},
+                                        ),
                                         icon_size=30,
                                         icon_color=colors.BLACK,
                                     ),
@@ -507,6 +561,41 @@ class Home:
                         duration=1000, switch_in_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
                         switch_out_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
                         content=self.__content_home(),
+                    ),
+                    Row(
+                        alignment=MainAxisAlignment.CENTER,
+                        controls=[
+                            Text(
+                                spans=[
+                                    TextSpan(
+                                        text="©",
+                                        style=TextStyle(
+                                            weight=FontWeight.W_500, color=colors.BLACK,
+                                            size=17,
+                                            shadow=BoxShadow(spread_radius=8, blur_radius=1,
+                                                             blur_style=ShadowBlurStyle.OUTER,
+                                                             color=colors.with_opacity(0.75,
+                                                                                       colors.BLACK),
+                                                             offset=(0, .0023),
+                                                             ),
+                                        ),
+                                    ),
+                                    TextSpan(
+                                        text="NH-CEN Group4 PROJECT",
+                                        style=TextStyle(
+                                            weight=FontWeight.W_500, color=colors.BLACK,
+                                            size=12,
+                                            shadow=BoxShadow(spread_radius=0, blur_radius=0,
+                                                             blur_style=ShadowBlurStyle.OUTER,
+                                                             color=colors.with_opacity(0.75,
+                                                                                       colors.BLACK),
+                                                             offset=(0, .0023),
+                                                             ),
+                                        ),
+                                    )
+                                ],
+                            ),
+                        ],
                     ),
                 ],
             ),
