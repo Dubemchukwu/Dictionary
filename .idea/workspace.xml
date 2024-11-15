@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.1">
+      <change afterPath="$PROJECT_DIR$/info.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HomeStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/HomeStudio/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MiniStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MiniStudio/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/recent.rec" beforeDir="false" afterPath="$PROJECT_DIR$/recent.rec" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731607174985</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Dictionary 0.0.1">
+      <option name="closed" value="true" />
+      <created>1731634345045</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1731634345045</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

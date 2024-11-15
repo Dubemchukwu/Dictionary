@@ -1,22 +1,53 @@
-import random
+import json
 import math
-from nltk.corpus import words
-from flet import *
-import time
-from icecream import ic as cout
+import random
 import threading
+import time
+
+from flet import *
+from icecream import ic as cout
+from nltk.corpus import words
 
 english_words = set(words.words())
 
 
+class Daily_:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def get_state():
+        try:
+            with open("info.json", "r") as file:
+                data = json.load(file)
+                return data
+        except FileNotFoundError:
+            return {"last_date": None, "quote_index": 0}
+
+    @staticmethod
+    def save_state(state):
+        with open("info.json", "w") as file:
+            json.dump(state, file)
+
 class ApiCont:
     def __init__(self):
         self.word = "Naive"
-        self.PAS = "adjective"
+        self.POS = "adjective"
         self.meaning = "Showing a lack of experience, wisdom or judgement."
+        self.daily_word_gen()
 
     def daily_word_gen(self):
-        self.__daily_word = random.choice(words.words())
+        data = Daily_.get_state()
+        if int(time.strftime("%d")) != data["date"]:
+            data["date"] = int(time.strftime("%d"))
+            data["word"] = random.choice(words.words())
+            Daily_.save_state(data)
+
+        else:
+            pass
+
+
+        # cout(Variable._daily_word)
 
 
 class Variable:
@@ -131,7 +162,7 @@ class daily_word:
                                                         word_spacing=2),
                                                 ),
                                                 Text(
-                                                    value="Naive", weight=FontWeight.W_900,
+                                                    value=ApiCont().word, weight=FontWeight.W_900,
                                                     size=20, color=self.color,
                                                     style=TextStyle(
                                                         shadow=BoxShadow(spread_radius=4, blur_radius=1,
@@ -323,7 +354,7 @@ class Home:
     def __expand_hist(self, e: ControlEvent):
         if e.control.text == "see all":
             e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
-                2].height = (38 * 2)
+                2].height = (38 * math.ceil(len(Variable().list_history()[0]+Variable().list_history()[1])/4))
 
             e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
                 2].controls.extend(

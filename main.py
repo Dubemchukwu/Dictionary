@@ -1,5 +1,7 @@
+import time
 from flet import *
 from MiniStudio import main
+from nltk.corpus import words
 
 
 # import flet
@@ -12,6 +14,7 @@ class Main:
         )
 
     def __init__(self, screen: Page):
+
         def view_pop(e):
             screen.views.pop()
             top_view = screen.views[-1]
@@ -23,6 +26,11 @@ class Main:
         screen.window.frameless = True
         main.UI(screen)
         screen.update()
+
+        # while True:
+        #     pass
+            # print("he is also")
+
 
 
 class Run:
