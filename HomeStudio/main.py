@@ -683,7 +683,6 @@ class Home:
                         switch_out_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
                         content=SearchWidget(None), #self.content_home(),
                     ),
-                    # TransparentPointer(height=10, visible=False),
                     Row(
                         alignment=MainAxisAlignment.CENTER,
                         vertical_alignment=CrossAxisAlignment.CENTER,
