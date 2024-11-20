@@ -3,12 +3,24 @@ import math
 import random
 import threading
 import time
+from HomeStudio.search import *
+import english_words
+import requests
+# from nltk.corpus import words
+from english_words import get_english_words_set
 
-from flet import *
-from icecream import ic as cout
-from nltk.corpus import words
+words = get_english_words_set(["web2"], alpha=True)
 
-english_words = set(words.words())
+
+class Words:
+    def __init__(self):
+        self.words = None
+
+    def init(self):
+        with open("dic_words.txt", "r") as file:
+            self.words = file.read().removesuffix("\n")
+            self.words = self.words.split("\n")
+        return self.words
 
 
 class Daily_:
@@ -29,29 +41,79 @@ class Daily_:
         with open("info.json", "w") as file:
             json.dump(state, file)
 
+
 class ApiCont:
     def __init__(self):
-        self.word = "Naive"
-        self.POS = "adjective"
-        self.meaning = "Showing a lack of experience, wisdom or judgement."
-        self.daily_word_gen()
-
-    def daily_word_gen(self):
         data = Daily_.get_state()
-        if int(time.strftime("%d")) != data["date"]:
-            data["date"] = int(time.strftime("%d"))
-            data["word"] = random.choice(words.words())
+        self.word = data["word"]
+        self.POS = data["pos"]
+        self.meaning = data["meaning"]
+
+    @staticmethod
+    def daily_word_gen(screen: Page):
+        __temp = ""
+        data = Daily_.get_state()
+        if int(time.strftime("%d")) == data["date"]:
+            # data["date"] = int(time.strftime("%d"))
+            word_ = random.choice(list(Words().init()))
+            cout(word_)
+            response = requests.get(
+                f"https://dictionaryapi.com/api/v3/references/sd4/json/{word_}?key=166e17cb-08dd-4439-a142"
+                f"-85763906e46d",
+            )
+
+            data["pos"] = response.json()[0]["fl"]
+            data["word"] = word_
+            for def_ in response.json()[0]["shortdef"]:
+                if len(def_) > len(__temp):
+                    __temp = def_
+
+            data["meaning"] = response.json()[0]["shortdef"][0]
+
+            # response.json()[0]["def"][0]["sseq"][1][0][1]["dt"][0][1].replace("{bc}",
+            #                                                                                 "").replace(
+            # "{", "").replace("}", "").replace("|", "")
+
+            cout(response.json())
+            cout(response.json()[0]["fl"], response.json()[0]["shortdef"], response.status_code)
+            cout(data)
             Daily_.save_state(data)
 
         else:
-            pass
+            cout("hello world!!!")
 
+        # if isinstance(screen.views[-1].controls[0].content.data, Variable):
+        #     screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[-1].content.controls[0]
+        #     # screen.
+        # except:
+        #     cout("errors")
+
+        # threading.Timer(60, ApiCont.daily_word_gen, kwargs={"screen":screen}).start()
+
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[0].controls[0].controls[1].value = data["word"]
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[0].controls[0].controls[2].value = data["pos"]
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[1].value = data["meaning"]
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[3].controls[0].value = time.strftime(f"%d{daily_word().suffix} %B, %Y")
+
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[0].controls[0].controls[1].update()
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[0].controls[0].controls[2].update()
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[1].update()
+        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+            -1].content.controls[3].controls[0].update()
 
         # cout(Variable._daily_word)
 
 
 class Variable:
     see_all_state = False
+    counts = 0
 
     def __init__(self):
         self.main_list = []
@@ -87,6 +149,7 @@ class Variable:
         return [self.main_list, self.remainder_list]
 
 
+# this is the daily word content
 class daily_word:
     def __init__(self):
         self.color = "#d9d9d9"
@@ -175,7 +238,7 @@ class daily_word:
                                                     ),
                                                 ),
                                                 Text(
-                                                    value="adjective", weight=FontWeight.NORMAL,
+                                                    value=ApiCont().POS, weight=FontWeight.NORMAL,
                                                     italic=True, size=11, color=self.color,
                                                     style=TextStyle(
                                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
@@ -210,7 +273,8 @@ class daily_word:
                                     ],
                                 ),
                                 Text(
-                                    value="Showing a lack of experience, wisdom or judgement.",
+                                    value=ApiCont().meaning, overflow=TextOverflow.ELLIPSIS,
+                                    max_lines=4,
                                     weight=FontWeight.W_500, size=14, color=self.color,
                                     style=TextStyle(
                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
@@ -221,7 +285,7 @@ class daily_word:
                                                          ), letter_spacing=0.5,
                                     ),
                                 ),
-                                TransparentPointer(height=50),
+                                TransparentPointer(height=40),
                                 Row(
                                     alignment=MainAxisAlignment.END,
                                     controls=[
@@ -272,7 +336,7 @@ class history(Container):
                 ),
                 IconButton(
                     icon=icons.CANCEL_OUTLINED,
-                    data=text_,
+                    data=[text_, Variable.counts],
                     on_click=lambda e: self.__delete(e),
                     icon_color="#1b1b1b",
                     icon_size=15,
@@ -283,11 +347,12 @@ class history(Container):
         self.height = 30
         self.border_radius = border_radius.all(20)
         self.bgcolor = "#d9d9d9"
+        Variable.counts += 1
 
     def __delete(self, e: ControlEvent):
         with open("recent.rec", "r") as file:
             file_data = file.read()
-            file_data = file_data.replace(e.control.data + ",", "")
+            file_data = file_data.replace(e.control.data[0] + ",", "")
 
         with open("recent.rec", "w") as file:
             file.write(file_data)
@@ -295,6 +360,29 @@ class history(Container):
 
         self.visible = False
         self.update()
+
+        print(e.control.data[1])
+        Variable.counts = 0
+
+        # e.page.views[-1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].controls.pop(
+        #     e.control.data[1])
+        #
+        # e.page.views[-1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
+        if Variable.see_all_state:
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].controls = Home()._add_history(
+                Variable().list_history()[0] + Variable().list_history()[1],
+            )
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].height = (38 * math.ceil(len(Variable().list_history()[0] + Variable().list_history()[1]) / 4))
+            cout("Debug: deleting")
+        else:
+            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+                2].controls = Home()._add_history(
+                Variable().list_history()[0],
+            )
+
+        e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
         cout("deleted successfully")
 
 
@@ -308,7 +396,7 @@ class Home:
         # print(word)
         # filtered_suggestions.controls.clear()
 
-        matches = [word for word in english_words if word.lower().startswith(e.data.lower())]
+        matches = [word for word in words if word.lower().startswith(e.data.lower())]
         for match in matches:
             if len(match) < len(word):
                 word = match
@@ -325,16 +413,16 @@ class Home:
         e.control.update()
 
     def __search_word(self, e: ControlEvent):
-        saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
-        saving.start()
+        if e.data != "" or e.data.isspace() is False:
+            saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
+            saving.start()
 
-        e.page.views[1].controls[0].content.content.controls[3].controls = [
-            Container(
-                height=460,
-            ),
-        ]
-        e.page.views[1].controls[0].content.content.controls[3].update()
-        cout(e.data)
+            e.page.views[1].controls[0].content.content.controls[2].controls[1].visible = True
+            e.page.views[1].controls[0].content.content.controls[2].controls[1].update()
+
+            e.page.views[1].controls[0].content.content.controls[3].content = SearchWidget(e)
+            e.page.views[1].controls[0].content.content.update()
+            cout(e.data)
 
     def add_suggestions(self, e: ControlEvent):
         e.control.value = self.__complete_text
@@ -354,7 +442,7 @@ class Home:
     def __expand_hist(self, e: ControlEvent):
         if e.control.text == "see all":
             e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
-                2].height = (38 * math.ceil(len(Variable().list_history()[0]+Variable().list_history()[1])/4))
+                2].height = (38 * math.ceil(len(Variable().list_history()[0] + Variable().list_history()[1]) / 4))
 
             e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
                 2].controls.extend(
@@ -386,7 +474,7 @@ class Home:
         e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
         cout(Variable.see_all_state)
 
-    def __content_home(self):
+    def content_home(self):
         return Column(
             alignment=MainAxisAlignment.SPACE_EVENLY,
             spacing=0, run_spacing=0, tight=True,
@@ -443,6 +531,7 @@ class Home:
 
     def _content_(self):
         return Container(
+            data=Variable(),
             shadow=BoxShadow(spread_radius=8, blur_radius=1,
                              blur_style=ShadowBlurStyle.OUTER,
                              color=colors.with_opacity(0.75,
@@ -507,7 +596,7 @@ class Home:
                             )
                         ],
                     ),
-                    TransparentPointer(height=40),
+                    TransparentPointer(height=35),
                     Row(
                         alignment=MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
@@ -576,7 +665,7 @@ class Home:
                                     750,
                                     animation.AnimationCurve.ELASTIC_IN_OUT),
                                 selected_icon=icons.BOOKMARK_ROUNDED,
-                                icon_color=colors.BLACK54, selected_icon_color=colors.BLACK87,
+                                icon_color=colors.BLACK, selected_icon_color=colors.BLACK54,
                                 splash_color=colors.BLACK,
                                 style=ButtonStyle(
                                     elevation=10,
@@ -588,13 +677,16 @@ class Home:
                     ),
                     AnimatedSwitcher(
                         transition=AnimatedSwitcherTransition.SCALE,
+                        height=550,
                         reverse_duration=750,
                         duration=1000, switch_in_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
                         switch_out_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
-                        content=self.__content_home(),
+                        content=SearchWidget(None), #self.content_home(),
                     ),
+                    # TransparentPointer(height=10, visible=False),
                     Row(
                         alignment=MainAxisAlignment.CENTER,
+                        vertical_alignment=CrossAxisAlignment.CENTER,
                         controls=[
                             Text(
                                 spans=[

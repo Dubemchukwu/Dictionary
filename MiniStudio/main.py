@@ -51,18 +51,21 @@ class UI:
 
     def __expand_(self, e: ControlEvent):
         # e.page.window.left = self.screen.window.left - 100
-        self.screen.window.height = 650
+        self.screen.window.height = 800 or 650
         self.screen.window.width = 500
         self.screen.window.top = 10
         self.screen.window.left = 1275 - self.screen.window.width // 2
         self.screen.update()
         e.control.width = 500
-        e.control.height = 650
+        e.control.height = 800 or 650
         e.control.border_radius = border_radius.all(15)
         e.control.on_click = lambda y: self.__close_all(y)
         e.control.data = 0
         e.page.views[1].controls[0].content = main.Home()._content_()
+        main.Variable.counts = 0
         e.control.update()
+
+        main.ApiCont.daily_word_gen(screen=self.screen)
 
     def __size_anim(self, e: ControlEvent):
         if e.control.data == 2:
