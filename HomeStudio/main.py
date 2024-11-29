@@ -5,7 +5,6 @@ import threading
 import time
 from HomeStudio.search import *
 import english_words
-import requests
 # from nltk.corpus import words
 from english_words import get_english_words_set
 
@@ -214,6 +213,7 @@ class daily_word:
                                             controls=[
                                                 Text(
                                                     value="Word of the day", size=14,
+                                                    font_family="league_light",
                                                     color=self.color,
                                                     style=TextStyle(
                                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
@@ -487,7 +487,7 @@ class Home:
                         spacing=0, run_spacing=0, tight=True,
                         # height=100,
                         controls=[
-                            Text("Recently Searched", size=15, color="#808080"),
+                            Text("Recently Searched", size=15, color="#808080", font_family="roboto_light"),
                             TransparentPointer(height=10),
                             GridView(
                                 animate_size=animation.Animation(750,
@@ -564,6 +564,7 @@ class Home:
                                              style=TextStyle(color=colors.BLACK),
                                              ),
                                 ],
+                                font_family="krona_one",
                             ),
                             Row(
                                 alignment=MainAxisAlignment.CENTER,
@@ -574,7 +575,11 @@ class Home:
                                         icon=icons.REFRESH_ROUNDED,
                                         rotate=0,
                                         style=ButtonStyle(
-                                            overlay_color={ControlState.DEFAULT: colors.BLACK12},
+                                            bgcolor=colors.TRANSPARENT,
+                                            overlay_color={ControlState.DEFAULT: colors.BLACK12,
+                                                           ControlState.PRESSED: colors.BLACK12,
+                                                           ControlState.HOVERED: colors.TRANSPARENT,
+                                                           },
                                         ),
                                         animate_rotation=animation.Animation(
                                             1500,
@@ -587,7 +592,11 @@ class Home:
                                     IconButton(
                                         icon=icons.MORE_HORIZ_ROUNDED,
                                         style=ButtonStyle(
-                                            overlay_color={ControlState.DEFAULT: colors.BLACK12},
+                                            bgcolor=colors.TRANSPARENT,
+                                            overlay_color={ControlState.DEFAULT: colors.BLACK12,
+                                                           ControlState.PRESSED: colors.BLACK12,
+                                                           ControlState.HOVERED: colors.TRANSPARENT,
+                                                           },
                                         ),
                                         icon_size=30,
                                         icon_color=colors.BLACK,
@@ -606,6 +615,7 @@ class Home:
                                     TextField(
                                         counter_style=TextStyle(
                                             size=15, color="#666666",
+                                            font_family="roboto"
                                         ),
                                         content_padding=padding.only(right=17.0, left=25.0),
                                         width=360,
@@ -613,6 +623,8 @@ class Home:
                                         selection_color="#606060",
                                         text_style=TextStyle(
                                             size=15, color="#666666",
+                                            font_family="roboto",
+                                            weight=FontWeight.W_600,
                                         ),
                                         border_radius=30, border=InputBorder.OUTLINE,
                                         bgcolor="#d9d9d9",
@@ -632,14 +644,17 @@ class Home:
                                         on_blur=lambda e: self.add_suggestions(e),
                                         counter_style=TextStyle(
                                             size=15, color="#666666",
+                                            font_family="roboto"
                                         ),
                                         content_padding=padding.only(right=17.0, left=25.0),
                                         width=360, hint_text="Type Here",
                                         hint_style=TextStyle(
                                             size=15, color="#666666",
+                                            font_family="roboto",
                                         ), cursor_color=colors.BLACK,
                                         selection_color="#606060",
-                                        text_style=TextStyle(size=15, color=colors.BLACK),
+                                        text_style=TextStyle(size=15, color=colors.BLACK,
+                                                             weight=FontWeight.W_600, font_family="roboto"),
                                         border_radius=30, border=InputBorder.OUTLINE,
                                         bgcolor=colors.with_opacity(0.012, "#d9d9d9"),
                                         border_color=colors.TRANSPARENT, border_width=1,
@@ -668,6 +683,7 @@ class Home:
                                 icon_color=colors.BLACK, selected_icon_color=colors.BLACK54,
                                 splash_color=colors.BLACK,
                                 style=ButtonStyle(
+                                    bgcolor=colors.TRANSPARENT,
                                     elevation=10,
                                     overlay_color=colors.BLACK38,
                                     surface_tint_color=colors.TRANSPARENT,
@@ -716,6 +732,7 @@ class Home:
                                         ),
                                     )
                                 ],
+                                font_family="inter_light",
                             ),
                         ],
                     ),
