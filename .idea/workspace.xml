@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.3 -&gt; fixed time issues and working on search page">
+    <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.4 -&gt; fixed the search result User Interface.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HomeStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/HomeStudio/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MiniStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MiniStudio/main.py" afterDir="false" />
@@ -43,6 +43,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run_script.executor&quot;: &quot;Run&quot;,
     &quot;Python.test.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -53,6 +54,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\DUBEM\Desktop\New Horizon\Dictionary\assets" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\DUBEM\Desktop\New Horizon\Dictionary\DataStudio" />
     </key>
   </component>
   <component name="RunManager">
@@ -151,7 +155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732130817419</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Dictionary 0.0.4 -&gt; fixed the search result User Interface.">
+      <option name="closed" value="true" />
+      <created>1732868479090</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1732868479090</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -180,6 +192,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Dictionary 0.0.1" />
     <MESSAGE value="Dictionary 0.0.3 -&gt; fixed time issues and working on search page" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dictionary 0.0.3 -&gt; fixed time issues and working on search page" />
+    <MESSAGE value="Dictionary 0.0.4 -&gt; fixed the search result User Interface." />
+    <option name="LAST_COMMIT_MESSAGE" value="Dictionary 0.0.4 -&gt; fixed the search result User Interface." />
   </component>
 </project>

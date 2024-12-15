@@ -16,7 +16,7 @@ class Words:
         self.words = None
 
     def init(self):
-        with open("dic_words.txt", "r") as file:
+        with open("DataStudio/dic_words.txt", "r") as file:
             self.words = file.read().removesuffix("\n")
             self.words = self.words.split("\n")
         return self.words
@@ -29,7 +29,7 @@ class Daily_:
     @staticmethod
     def get_state():
         try:
-            with open("info.json", "r") as file:
+            with open("DataStudio/info.json", "r") as file:
                 data = json.load(file)
                 return data
         except FileNotFoundError:
@@ -37,7 +37,7 @@ class Daily_:
 
     @staticmethod
     def save_state(state):
-        with open("info.json", "w") as file:
+        with open("DataStudio/info.json", "w") as file:
             json.dump(state, file)
 
 
@@ -52,8 +52,9 @@ class ApiCont:
     def daily_word_gen(screen: Page):
         __temp = ""
         data = Daily_.get_state()
-        if int(time.strftime("%d")) == data["date"]:
-            # data["date"] = int(time.strftime("%d"))
+        if int(time.strftime("%d")) != int(data["date"]):
+            Constants().set_daily_saved_state(False)
+            data["date"] = int(time.strftime("%d"))
             word_ = random.choice(list(Words().init()))
             cout(word_)
             response = requests.get(
@@ -66,8 +67,9 @@ class ApiCont:
             for def_ in response.json()[0]["shortdef"]:
                 if len(def_) > len(__temp):
                     __temp = def_
+            # response.json()[0]["shortdef"][0]
 
-            data["meaning"] = response.json()[0]["shortdef"][0]
+            data["meaning"] = __temp
 
             # response.json()[0]["def"][0]["sseq"][1][0][1]["dt"][0][1].replace("{bc}",
             #                                                                                 "").replace(
@@ -82,33 +84,72 @@ class ApiCont:
             cout("hello world!!!")
 
         # if isinstance(screen.views[-1].controls[0].content.data, Variable):
-        #     screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[-1].content.controls[0]
+        #     screen.views[-1].controls[0].content.content.content.controls[3].content.controls[-2].content.controls[-1].content.controls[0]
         #     # screen.
         # except:
         #     cout("errors")
 
         # threading.Timer(60, ApiCont.daily_word_gen, kwargs={"screen":screen}).start()
-
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[0].controls[0].controls[1].value = data["word"]
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[0].controls[0].controls[2].value = data["pos"]
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[1].value = data["meaning"]
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[3].controls[0].value = time.strftime(f"%d{daily_word().suffix} %B, %Y")
 
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[0].controls[0].controls[1].update()
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[0].controls[0].controls[2].update()
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[1].update()
-        screen.views[-1].controls[0].content.content.controls[3].content.controls[-2].content.controls[
+        screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            -2].content.controls[
             -1].content.controls[3].controls[0].update()
 
         # cout(Variable._daily_word)
 
+class Constants:
+    def __init__(self):
+        pass
+
+    def set_daily_saved_state(self, state: bool) -> None:
+        data = dict()
+        try:
+            with open("DataStudio/constants.json", "r") as file:
+                data = json.load(file)
+        except json.decoder.JSONDecodeError as error:
+            pass
+        finally:
+            data["daily_saved_state"] = state
+
+        with open("DataStudio/constants.json", "w") as file:
+            json.dump(data, file)
+
+
+    def get_daily_saved_state(self) -> bool:
+        try:
+            with open("DataStudio/constants.json", "r") as file:
+                data = json.load(file)
+
+            return data.get("daily_saved_state")
+
+        except json.decoder.JSONDecodeError as error:
+            return False
+
+        except FileNotFoundError as error:
+            with open("DataStudio/constants.json", "x") as file:
+                ...
+            return False
 
 class Variable:
     see_all_state = False
@@ -118,23 +159,53 @@ class Variable:
         self.main_list = []
         self.remainder_list = []
 
+    @staticmethod
+    def delete_bookmark(data: dict):
+        [data.pop(key) for key in ["date", "check"]]
+        with open("DataStudio/saved.json", "r") as file:
+            full_data: list = json.load(file)
+
+        full_data.remove(data)
+
+        with open("DataStudio/saved.json", "w") as file:
+            json.dump(full_data, file)
+
+    @staticmethod
+    def save_bookmark(data: dict):
+        [data.pop(key) for key in ["date", "check"]]
+        full_data: list = []
+        try:
+            with open("DataStudio/saved.json", "r") as file:
+                full_data: list = json.load(file)
+        except:
+            full_data: list = []
+
+        finally:
+            full_data.append(data)
+            with open("DataStudio/saved.json", "w") as file:
+                json.dump(full_data, file)
+
+    def undo_refresh(self, e: ControlEvent):
+        e.control.rotate -= math.pi * 2
+        e.control.update()
+
     def refresh_all(self, e: ControlEvent):
-        e.control.rotate = e.control.rotate + math.pi * 2
+        e.control.rotate += math.pi * 2
         e.control.update()
 
     def _refreshing_all(self, e: ControlEvent):
         e.page.views[1].controls[0].content = None
-        e.page.views[1].controls[0].content = Home()._content_()
+        e.page.views[1].controls[0].content = Home()._content_(e)
         e.page.views[1].controls[0].update()
         cout("refreshed")
 
     def create_history(self, wordz):
-        with open("recent.rec", "a") as recent:
+        with open("DataStudio/recent.rec", "a") as recent:
             recent.write(wordz + ",")
 
     def list_history(self):
         self.checking = 0
-        with open("recent.rec", "r") as recent:
+        with open("DataStudio/recent.rec", "r") as recent:
             wordz = recent.read()[:-1]
             wordz = wordz.split(",")
 
@@ -167,15 +238,17 @@ class daily_word:
         #     self._build().content.controls[1].content.controls[3].controls[0].value = time.strftime(f"%d{suffix} %B, %Y")
 
     def _save_(self, e: ControlEvent):
-        if e.control.rotate > math.pi:
-            e.control.rotate = 0
-        else:
-            e.control.rotate = math.pi * 2
+        e.control.scale = 1.25
         e.control.selected = True if e.control.selected == False else False
         e.control.update()
+        Constants().set_daily_saved_state(e.control.selected)
+        if e.control.selected:
+            Variable.save_bookmark(e.control.data)
+        else:
+            Variable.delete_bookmark(e.control.data)
 
     def _end_save_(self, e: ControlEvent):
-        # e.control.rotate = math.pi
+        e.control.scale = 1
         e.control.update()
 
     def _build(self):
@@ -188,12 +261,12 @@ class daily_word:
                         filter_quality=FilterQuality.LOW,
                         src=f"https://picsum.photos/id/{self.choice}/450/250",
                         color_blend_mode=BlendMode.DST_IN,
-                        color=colors.BLACK,
+                        color=Colors.BLACK,
                         width=450, height=250, fit=ImageFit.COVER,
                         border_radius=border_radius.all(20),
                     ),
                     Container(width=450, height=250, border_radius=20,
-                              bgcolor=colors.with_opacity(0.55, colors.BLACK),
+                              bgcolor=Colors.with_opacity(0.55, Colors.BLACK),
                               alignment=alignment.center_left,
                               ),
                     Container(
@@ -212,26 +285,27 @@ class daily_word:
                                             horizontal_alignment=CrossAxisAlignment.START,
                                             controls=[
                                                 Text(
-                                                    value="Word of the day", size=14,
+                                                    value="Word of the day", size=15,
                                                     font_family="league_light",
                                                     color=self.color,
                                                     style=TextStyle(
                                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
                                                                          blur_style=ShadowBlurStyle.OUTER,
-                                                                         color=colors.with_opacity(0.75,
-                                                                                                   colors.BLACK),
+                                                                         color=Colors.with_opacity(0.75,
+                                                                                                   Colors.BLACK),
                                                                          offset=(0, .0023),
                                                                          ),
                                                         word_spacing=2),
                                                 ),
                                                 Text(
-                                                    value=ApiCont().word, weight=FontWeight.W_900,
-                                                    size=20, color=self.color,
+                                                    value=str(ApiCont().word).lower(), weight=FontWeight.W_900,
+                                                    size=22, color=self.color,
                                                     style=TextStyle(
+                                                        font_family="spartan_semi_bold",
                                                         shadow=BoxShadow(spread_radius=4, blur_radius=1,
                                                                          blur_style=ShadowBlurStyle.OUTER,
-                                                                         color=colors.with_opacity(0.5,
-                                                                                                   colors.BLACK),
+                                                                         color=Colors.with_opacity(0.5,
+                                                                                                   Colors.BLACK),
                                                                          offset=(0, .0023),
                                                                          ),
                                                         letter_spacing=3,
@@ -239,12 +313,13 @@ class daily_word:
                                                 ),
                                                 Text(
                                                     value=ApiCont().POS, weight=FontWeight.NORMAL,
-                                                    italic=True, size=11, color=self.color,
+                                                    italic=True, size=13, color=self.color,
                                                     style=TextStyle(
+                                                        font_family="roboto_mono_light",
                                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
                                                                          blur_style=ShadowBlurStyle.OUTER,
-                                                                         color=colors.with_opacity(0.75,
-                                                                                                   colors.BLACK),
+                                                                         color=Colors.with_opacity(0.75,
+                                                                                                   Colors.BLACK),
                                                                          offset=(0, .0023),
                                                                          ), letter_spacing=1,
                                                     ),
@@ -253,21 +328,23 @@ class daily_word:
                                         ),
 
                                         IconButton(
-                                            icon=icons.BOOKMARK_OUTLINE_ROUNDED,
-                                            rotate=0,
+                                            icon=Icons.BOOKMARK_OUTLINE_ROUNDED,
+                                            scale=1,
+                                            data=Daily_.get_state(),
+                                            selected=Constants().get_daily_saved_state(),
                                             icon_size=30, splash_radius=10,
+                                            splash_color=Colors.WHITE,
                                             on_click=lambda e: self._save_(e),
                                             on_animation_end=lambda e: self._end_save_(e),
-                                            animate_rotation=animation.Animation(
-                                                750,
-                                                animation.AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
-                                            selected_icon=icons.BOOKMARK_ROUNDED,
-                                            icon_color=colors.WHITE, selected_icon_color=colors.WHITE,
-                                            splash_color=colors.WHITE,
+                                            animate_scale=animation.Animation(
+                                                550,
+                                                animation.AnimationCurve.ELASTIC_OUT),
+                                            selected_icon=Icons.BOOKMARK_ROUNDED,
+                                            icon_color=Colors.WHITE, selected_icon_color=Colors.WHITE,
                                             style=ButtonStyle(
                                                 elevation=10,
-                                                overlay_color=colors.BLACK12,
-                                                surface_tint_color=colors.TRANSPARENT,
+                                                overlay_color=Colors.BLACK12,
+                                                surface_tint_color=Colors.TRANSPARENT,
                                             ),
                                         ),
                                     ],
@@ -279,8 +356,8 @@ class daily_word:
                                     style=TextStyle(
                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
                                                          blur_style=ShadowBlurStyle.OUTER,
-                                                         color=colors.with_opacity(0.75,
-                                                                                   colors.BLACK),
+                                                         color=Colors.with_opacity(0.75,
+                                                                                   Colors.BLACK),
                                                          offset=(0, .0023),
                                                          ), letter_spacing=0.5,
                                     ),
@@ -295,8 +372,8 @@ class daily_word:
                                             style=TextStyle(
                                                 shadow=BoxShadow(spread_radius=8, blur_radius=1,
                                                                  blur_style=ShadowBlurStyle.OUTER,
-                                                                 color=colors.with_opacity(0.75,
-                                                                                           colors.BLACK),
+                                                                 color=Colors.with_opacity(0.75,
+                                                                                           Colors.BLACK),
                                                                  offset=(0, .0023),
                                                                  ),
                                                 word_spacing=2),
@@ -319,23 +396,28 @@ class history(Container):
         self.content = Row(
             width=83,
             alignment=MainAxisAlignment.SPACE_BETWEEN,
+            vertical_alignment=CrossAxisAlignment.END,
             spacing=1, run_spacing=1,
             controls=[
                 Container(
-                    padding=padding.only(left=3),
+                    padding=padding.only(left=0),
                     width=60,
                     alignment=alignment.center,
                     content=Text(
                         value=text_,
+                        text_align=TextAlign.CENTER,
                         overflow=TextOverflow.ELLIPSIS,
+                        font_family="spartan",
+                        height=20,
                         width=60,
-                        size=13,
+                        size=16,
                         color="#434343",
                     ),
-                    # on_click=lambda e: se
+                    on_click=lambda e: self.__search_word__(e),
                 ),
                 IconButton(
-                    icon=icons.CANCEL_OUTLINED,
+                    icon=Icons.CANCEL_OUTLINED,
+                    scale=1.1,
                     data=[text_, Variable.counts],
                     on_click=lambda e: self.__delete(e),
                     icon_color="#1b1b1b",
@@ -348,6 +430,20 @@ class history(Container):
         self.border_radius = border_radius.all(20)
         self.bgcolor = "#d9d9d9"
         Variable.counts += 1
+
+    def __search_word__(self, e: ControlEvent):
+        e.data = e.control.content.value
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+            1].value = e.data
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].data = "Search"
+        saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
+
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = True
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
+
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
+        e.page.views[1].controls[0].content.content.content.controls[0].update()
+        cout(e.data)
 
     def __delete(self, e: ControlEvent):
         with open("recent.rec", "r") as file:
@@ -364,25 +460,29 @@ class history(Container):
         print(e.control.data[1])
         Variable.counts = 0
 
-        # e.page.views[-1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].controls.pop(
+        # e.page.views[-1].controls[0].content.content.content.controls[3].content.controls[0].content.controls[2].controls.pop(
         #     e.control.data[1])
         #
-        # e.page.views[-1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
+        # e.page.views[-1].controls[0].content.content.content.controls[3].content.controls[0].content.controls[2].update()
         if Variable.see_all_state:
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].controls = Home()._add_history(
                 Variable().list_history()[0] + Variable().list_history()[1],
             )
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].height = (38 * math.ceil(len(Variable().list_history()[0] + Variable().list_history()[1]) / 4))
             cout("Debug: deleting")
         else:
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].controls = Home()._add_history(
                 Variable().list_history()[0],
             )
 
-        e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            0].content.controls[2].update()
         cout("deleted successfully")
 
 
@@ -402,10 +502,12 @@ class Home:
                 word = match
 
         if "." in word or len(word) == 1:
-            e.page.views[1].controls[0].content.content.controls[2].controls[0].controls[0].value = ""
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+                0].value = ""
             # e.page.helper_text = ""
         else:
-            e.page.views[1].controls[0].content.content.controls[2].controls[0].controls[0].value = word.lower()
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+                0].value = word.lower()
             self.__complete_text = word.lower()
             cout(word.lower())
             # e.control.select_range(len(e.data), len(word))
@@ -414,19 +516,16 @@ class Home:
 
     def __search_word(self, e: ControlEvent):
         if e.data != "" or e.data.isspace() is False:
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].data = "Search"
             saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
             saving.start()
 
-            e.page.views[1].controls[0].content.content.controls[2].controls[1].visible = True
-            e.page.views[1].controls[0].content.content.controls[2].controls[1].update()
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = True
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
 
-            e.page.views[1].controls[0].content.content.controls[3].content = SearchWidget(e)
-            e.page.views[1].controls[0].content.content.update()
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
+            e.page.views[1].controls[0].content.content.content.controls[0].update()
             cout(e.data)
-
-    def add_suggestions(self, e: ControlEvent):
-        e.control.value = self.__complete_text
-        e.control.update()
 
     def _add_history(self, array):
         controls = []
@@ -441,10 +540,12 @@ class Home:
 
     def __expand_hist(self, e: ControlEvent):
         if e.control.text == "see all":
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].height = (38 * math.ceil(len(Variable().list_history()[0] + Variable().list_history()[1]) / 4))
 
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].controls.extend(
                 self._add_history(
                     Variable().list_history()[1],
@@ -453,25 +554,30 @@ class Home:
             e.control.text = "Shrink"
 
         else:
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].expand = False
 
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].height = 38
 
             e.control.text = "see all"
-            e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                0].content.controls[
                 2].controls = self._add_history(
                 Variable().list_history()[0],
             )
             Variable.see_all_state = False
 
-        cout(len(e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[
+        cout(len(e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                     0].content.controls[
                      2].controls))
 
         cout(e.data, "clicked")
         e.control.update()
-        e.page.views[1].controls[0].content.content.controls[3].content.controls[0].content.controls[2].update()
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            0].content.controls[2].update()
         cout(Variable.see_all_state)
 
     def content_home(self):
@@ -487,7 +593,7 @@ class Home:
                         spacing=0, run_spacing=0, tight=True,
                         # height=100,
                         controls=[
-                            Text("Recently Searched", size=15, color="#808080", font_family="roboto_light"),
+                            Text("Recently Searched", size=18, color="#000000", font_family="roboto"),
                             TransparentPointer(height=10),
                             GridView(
                                 animate_size=animation.Animation(750,
@@ -513,10 +619,10 @@ class Home:
                                             color={ControlState.DEFAULT: "#292929",
                                                    ControlState.HOVERED: "#d9d9d9",
                                                    ControlState.PRESSED: "#404040"},
-                                            bgcolor=colors.WHITE,
+                                            bgcolor=Colors.WHITE,
                                             shape=BeveledRectangleBorder(1),
-                                            overlay_color=colors.TRANSPARENT,  # "#404040",
-                                            surface_tint_color=colors.BLACK,
+                                            overlay_color=Colors.TRANSPARENT,  # "#404040",
+                                            surface_tint_color=Colors.BLACK,
                                         ),
                                     )
                                 ]
@@ -529,213 +635,393 @@ class Home:
             ],
         )
 
-    def _content_(self):
+    def __add_back_button(self, e: HoverEvent):
+        if e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].data != "Home":
+            if e.global_x <= e.page.width / 5:
+                if e.global_x <= 30.0:
+                    e.control.content.controls[-1].offset = (-1.75, 0)
+                    e.control.content.controls[-1].update()
+                else:
+                    e.control.content.controls[-1].offset = (0.07, 0)
+                    e.control.content.controls[-1].update()
+
+            elif e.global_x >= e.page.width - (e.page.width / 5):
+                if e.global_x >= 478.0:
+                    e.control.content.controls[-2].offset = (1, 0)
+                    e.control.content.controls[-2].update()
+                else:
+                    e.control.content.controls[-2].offset = (-0.75, 0)
+                    e.control.content.controls[-2].update()
+            else:
+                e.control.content.controls[-1].offset = (-1.75, 0)
+                e.control.content.controls[-1].update()
+                e.control.content.controls[-2].offset = (1, 0)
+                e.control.content.controls[-2].update()
+
+    def __back(self, e: ControlEvent):
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = False
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
+
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+            0].value = ""
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+            1].value = ""
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].update()
+        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].data = "Home"
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = self.content_home()
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].update()
+        if e.control.data == "left":
+            e.control.offset = (-1.75, 0)
+            e.control.update()
+        else:
+            e.control.offset = (1, 0)
+            e.control.update()
+
+    def change_screen(self, e: ControlEvent):
+        if e.control.data == "saved":
+            e.page.go("/saved")
+            cout(e.page.route)
+        elif e.control.data == "games":
+            pass
+
+    def _content_(self, e):
         return Container(
             data=Variable(),
             shadow=BoxShadow(spread_radius=8, blur_radius=1,
                              blur_style=ShadowBlurStyle.OUTER,
-                             color=colors.with_opacity(0.75,
-                                                       colors.BLACK),
+                             color=Colors.with_opacity(0.75,
+                                                       Colors.BLACK),
                              offset=(0, .0023),
                              ),
             padding=padding.symmetric(0, 20),
-            content=Column(
-                alignment=MainAxisAlignment.END,
-                horizontal_alignment=CrossAxisAlignment.CENTER,
-                controls=[
-                    Row(
-                        alignment=MainAxisAlignment.SPACE_BETWEEN,
-                        vertical_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            Text(
-                                size=30,
-                                spans=[
-                                    TextSpan("D",
-                                             style=TextStyle(color="#9d0208"),
-                                             ),
+            content=GestureDetector(
+                expand=True,
+                on_hover=self.__add_back_button,
+                content=Stack(
+                    alignment=alignment.top_center,
+                    controls=[
+                        Column(
+                            alignment=MainAxisAlignment.END,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Row(
+                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                    vertical_alignment=CrossAxisAlignment.CENTER,
+                                    controls=[
+                                        Text(
+                                            size=30,
+                                            spans=[
+                                                TextSpan("D",
+                                                         style=TextStyle(color="#9d0208"),
+                                                         ),
 
-                                    TextSpan("icti",
-                                             style=TextStyle(color=colors.BLACK),
-                                             ),
-                                    TextSpan("o",
-                                             style=TextStyle(color="#9d0208"),
-                                             ),
-                                    TextSpan("nary",
-                                             style=TextStyle(color=colors.BLACK),
-                                             ),
-                                ],
-                                font_family="krona_one",
-                            ),
-                            Row(
-                                alignment=MainAxisAlignment.CENTER,
-                                spacing=20,
-                                vertical_alignment=CrossAxisAlignment.CENTER,
-                                controls=[
-                                    IconButton(
-                                        icon=icons.REFRESH_ROUNDED,
-                                        rotate=0,
-                                        style=ButtonStyle(
-                                            bgcolor=colors.TRANSPARENT,
-                                            overlay_color={ControlState.DEFAULT: colors.BLACK12,
-                                                           ControlState.PRESSED: colors.BLACK12,
-                                                           ControlState.HOVERED: colors.TRANSPARENT,
-                                                           },
+                                                TextSpan("icti",
+                                                         style=TextStyle(color=Colors.BLACK),
+                                                         ),
+                                                TextSpan("o",
+                                                         style=TextStyle(color="#9d0208"),
+                                                         ),
+                                                TextSpan("nary",
+                                                         style=TextStyle(color=Colors.BLACK),
+                                                         ),
+                                            ],
+                                            font_family="krona_one",
                                         ),
-                                        animate_rotation=animation.Animation(
-                                            1500,
-                                            AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
-                                        on_click=lambda e: Variable().refresh_all(e),
-                                        on_animation_end=lambda e: Variable()._refreshing_all(e),
-                                        icon_size=30,
-                                        icon_color=colors.BLACK,
-                                    ),
-                                    IconButton(
-                                        icon=icons.MORE_HORIZ_ROUNDED,
-                                        style=ButtonStyle(
-                                            bgcolor=colors.TRANSPARENT,
-                                            overlay_color={ControlState.DEFAULT: colors.BLACK12,
-                                                           ControlState.PRESSED: colors.BLACK12,
-                                                           ControlState.HOVERED: colors.TRANSPARENT,
-                                                           },
+                                        Row(
+                                            alignment=MainAxisAlignment.CENTER,
+                                            spacing=20,
+                                            vertical_alignment=CrossAxisAlignment.CENTER,
+                                            controls=[
+                                                IconButton(
+                                                    icon=Icons.REFRESH_ROUNDED,
+                                                    rotate=0,
+                                                    style=ButtonStyle(
+                                                        bgcolor=Colors.TRANSPARENT,
+                                                        overlay_color={ControlState.DEFAULT: Colors.BLACK12,
+                                                                       ControlState.PRESSED: Colors.BLACK12,
+                                                                       ControlState.HOVERED: Colors.TRANSPARENT,
+                                                                       },
+                                                    ),
+                                                    animate_rotation=animation.Animation(
+                                                        1500,
+                                                        AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
+                                                    on_click=lambda e: Variable().refresh_all(e),
+                                                    on_animation_end=lambda e: Variable()._refreshing_all(e),
+                                                    icon_size=30,
+                                                    icon_color=Colors.BLACK,
+                                                ),
+                                                PopupMenuButton(
+                                                    tooltip="",
+                                                    bgcolor="#e3e3e3",
+                                                    size_constraints=BoxConstraints(min_width=110, max_width=110),
+                                                    rotate=0,
+                                                    animate_rotation=Animation(1000,
+                                                                               AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
+                                                    on_open=Variable().refresh_all,
+                                                    on_cancel=Variable().undo_refresh,
+                                                    on_select=Variable().undo_refresh,
+                                                    elevation=None,
+                                                    menu_position=PopupMenuPosition.UNDER,
+                                                    menu_padding=padding.only(top=15),
+                                                    popup_animation_style=animation.AnimationStyle(500, 500,
+                                                                                                   AnimationCurve.LINEAR_TO_EASE_OUT,
+                                                                                                   AnimationCurve.LINEAR_TO_EASE_OUT),
+                                                    shadow_color=Colors.TRANSPARENT,
+                                                    surface_tint_color=Colors.TRANSPARENT,
+                                                    icon=Icons.MORE_HORIZ_ROUNDED,
+                                                    icon_size=30,
+                                                    icon_color=Colors.BLACK,
+                                                    items=[
+                                                        PopupMenuItem(
+                                                            content=Row(
+                                                                alignment=MainAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    SegmentedButton(
+                                                                        width=90,
+                                                                        height=40,
+                                                                        style=ButtonStyle(
+                                                                            bgcolor={ControlState.SELECTED: "#999999",
+                                                                                     ControlState.DEFAULT: "#d9d9d9"},
+                                                                        ),
+                                                                        show_selected_icon=False,
+                                                                        selected={"light"},
+                                                                        allow_empty_selection=False,
+                                                                        allow_multiple_selection=False,
+                                                                        on_change=lambda e: cout(
+                                                                            list(e.control.selected)[0]),
+                                                                        segments=[
+                                                                            Segment(
+                                                                                value="light",
+                                                                                icon=Icon(
+                                                                                    name=Icons.SUNNY,
+                                                                                    size=20, color=Colors.BLACK,
+                                                                                ),
+                                                                            ),
+                                                                            Segment(
+                                                                                value="dark",
+                                                                                icon=Icon(
+                                                                                    name=Icons.SHIELD_MOON_ROUNDED,
+                                                                                    size=20, color=Colors.BLACK,
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                            on_click=self.change_screen,
+                                                            data="saved",
+                                                            content=Row(
+                                                                alignment=MainAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    Text(
+                                                                        text_align=TextAlign.CENTER,
+                                                                        value="SAVED",
+                                                                        font_family="spartan",
+                                                                        weight=FontWeight.W_800,
+                                                                        size=20,
+                                                                        color="#1d3557",
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                            on_click=self.change_screen,
+                                                            data="games",
+                                                            content=Row(
+                                                                alignment=MainAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    Text(
+                                                                        text_align=TextAlign.CENTER,
+                                                                        value="GAMES",
+                                                                        color="#9d0208",
+                                                                        font_family="spartan",
+                                                                        weight=FontWeight.W_800,
+                                                                        size=20,
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
                                         ),
-                                        icon_size=30,
-                                        icon_color=colors.BLACK,
-                                    ),
-                                ]
-                            )
-                        ],
-                    ),
-                    TransparentPointer(height=35),
-                    Row(
-                        alignment=MainAxisAlignment.SPACE_BETWEEN,
-                        controls=[
-                            Stack(
-                                alignment=alignment.center,
-                                controls=[
-                                    TextField(
-                                        counter_style=TextStyle(
-                                            size=15, color="#666666",
-                                            font_family="roboto"
-                                        ),
-                                        content_padding=padding.only(right=17.0, left=25.0),
-                                        width=360,
-                                        cursor_color=colors.BLACK,
-                                        selection_color="#606060",
-                                        text_style=TextStyle(
-                                            size=15, color="#666666",
-                                            font_family="roboto",
-                                            weight=FontWeight.W_600,
-                                        ),
-                                        border_radius=30, border=InputBorder.OUTLINE,
-                                        bgcolor="#d9d9d9",
-                                        border_color=colors.BLACK, border_width=1,
-                                        # suffix_icon=icons.SEARCH_ROUNDED,
-                                        suffix=Icon(
-                                            size=15, scale=1.9,
-                                            offset=(0, 0.1),
-                                            name=icons.SEARCH_ROUNDED,
-                                            color=colors.BLACK,
-                                        ),
-                                    ),
-
-                                    TextField(
-                                        on_submit=lambda e: self.__search_word(e),
-                                        on_change=lambda e: self.__update_suggestions(e),
-                                        on_blur=lambda e: self.add_suggestions(e),
-                                        counter_style=TextStyle(
-                                            size=15, color="#666666",
-                                            font_family="roboto"
-                                        ),
-                                        content_padding=padding.only(right=17.0, left=25.0),
-                                        width=360, hint_text="Type Here",
-                                        hint_style=TextStyle(
-                                            size=15, color="#666666",
-                                            font_family="roboto",
-                                        ), cursor_color=colors.BLACK,
-                                        selection_color="#606060",
-                                        text_style=TextStyle(size=15, color=colors.BLACK,
-                                                             weight=FontWeight.W_600, font_family="roboto"),
-                                        border_radius=30, border=InputBorder.OUTLINE,
-                                        bgcolor=colors.with_opacity(0.012, "#d9d9d9"),
-                                        border_color=colors.TRANSPARENT, border_width=1,
-                                        enable_suggestions=True, autocorrect=True,
-                                        # suffix_icon=icons.SEARCH_ROUNDED,
-                                        suffix=Icon(
-                                            size=15, scale=1.9,
-                                            offset=(0, 0.1),
-                                            name=icons.SEARCH_ROUNDED,
-                                            color=colors.BLACK,
-                                        ),
-                                    ),
-                                ],
-                            ),
-                            IconButton(
-                                icon=icons.BOOKMARK_OUTLINE_ROUNDED,
-                                visible=False,
-                                rotate=0,
-                                icon_size=30, splash_radius=4,
-                                on_click=lambda e: daily_word()._save_(e),
-                                on_animation_end=lambda e: daily_word()._end_save_(e),
-                                animate_rotation=animation.Animation(
-                                    750,
-                                    animation.AnimationCurve.ELASTIC_IN_OUT),
-                                selected_icon=icons.BOOKMARK_ROUNDED,
-                                icon_color=colors.BLACK, selected_icon_color=colors.BLACK54,
-                                splash_color=colors.BLACK,
-                                style=ButtonStyle(
-                                    bgcolor=colors.TRANSPARENT,
-                                    elevation=10,
-                                    overlay_color=colors.BLACK38,
-                                    surface_tint_color=colors.TRANSPARENT,
+                                    ],
                                 ),
-                            ),
-                        ],
-                    ),
-                    AnimatedSwitcher(
-                        transition=AnimatedSwitcherTransition.SCALE,
-                        height=550,
-                        reverse_duration=750,
-                        duration=1000, switch_in_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
-                        switch_out_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
-                        content=SearchWidget(None), #self.content_home(),
-                    ),
-                    Row(
-                        alignment=MainAxisAlignment.CENTER,
-                        vertical_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            Text(
-                                spans=[
-                                    TextSpan(
-                                        text="©",
-                                        style=TextStyle(
-                                            weight=FontWeight.W_500, color=colors.BLACK,
-                                            size=17,
-                                            shadow=BoxShadow(spread_radius=8, blur_radius=1,
-                                                             blur_style=ShadowBlurStyle.OUTER,
-                                                             color=colors.with_opacity(0.75,
-                                                                                       colors.BLACK),
-                                                             offset=(0, .0023),
-                                                             ),
+                                TransparentPointer(height=35),
+                                Row(
+                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                    controls=[
+                                        Stack(
+                                            alignment=alignment.center,
+                                            controls=[
+                                                TextField(
+                                                    counter_style=TextStyle(
+                                                        size=15, color="#666666",
+                                                        font_family="roboto"
+                                                    ),
+                                                    content_padding=padding.only(right=17.0, left=25.0),
+                                                    width=360,
+                                                    cursor_color=Colors.BLACK,
+                                                    selection_color="#606060",
+                                                    text_style=TextStyle(
+                                                        size=15, color="#666666",
+                                                        font_family="roboto",
+                                                        weight=FontWeight.W_600,
+                                                    ),
+                                                    border_radius=30, border=InputBorder.OUTLINE,
+                                                    bgcolor="#d9d9d9",
+                                                    border_color=Colors.BLACK, border_width=1,
+                                                    # suffix_icon=Icons.SEARCH_ROUNDED,
+                                                    suffix=Icon(
+                                                        size=15, scale=1.9,
+                                                        offset=(0, 0.1),
+                                                        name=Icons.SEARCH_ROUNDED,
+                                                        color=Colors.BLACK,
+                                                    ),
+                                                ),
+
+                                                TextField(
+                                                    on_submit=lambda e: self.__search_word(e),
+                                                    on_change=lambda e: self.__update_suggestions(e),
+                                                    counter_style=TextStyle(
+                                                        size=15, color="#666666",
+                                                        font_family="roboto",
+                                                    ),
+                                                    content_padding=padding.only(right=17.0, left=25.0),
+                                                    width=360, hint_text="Type Here",
+                                                    hint_style=TextStyle(
+                                                        size=15, color="#666666",
+                                                        font_family="roboto",
+                                                    ), cursor_color=Colors.BLACK,
+                                                    selection_color="#606060",
+                                                    text_style=TextStyle(size=15, color=Colors.BLACK,
+                                                                         weight=FontWeight.W_600, font_family="roboto"),
+                                                    border_radius=30, border=InputBorder.OUTLINE,
+                                                    bgcolor=Colors.with_opacity(0.012, "#d9d9d9"),
+                                                    border_color=Colors.TRANSPARENT, border_width=1,
+                                                    enable_suggestions=True, autocorrect=True,
+                                                    # suffix_icon=Icons.SEARCH_ROUNDED,
+                                                    suffix=Icon(
+                                                        size=15, scale=1.9,
+                                                        offset=(0, 0.1),
+                                                        name=Icons.SEARCH_ROUNDED,
+                                                        color=Colors.BLACK,
+                                                    ),
+                                                ),
+                                            ],
                                         ),
-                                    ),
-                                    TextSpan(
-                                        text="NH-CEN Group4 PROJECT",
-                                        style=TextStyle(
-                                            weight=FontWeight.W_500, color=colors.BLACK,
-                                            size=12,
-                                            shadow=BoxShadow(spread_radius=0, blur_radius=0,
-                                                             blur_style=ShadowBlurStyle.OUTER,
-                                                             color=colors.with_opacity(0.75,
-                                                                                       colors.BLACK),
-                                                             offset=(0, .0023),
-                                                             ),
+                                        IconButton(
+                                            icon=Icons.BOOKMARK_OUTLINE_ROUNDED,
+                                            visible=False,
+                                            rotate=0,
+                                            icon_size=30, splash_radius=4,
+                                            on_click=lambda e: daily_word()._save_(e),
+                                            on_animation_end=lambda e: daily_word()._end_save_(e),
+                                            animate_rotation=animation.Animation(
+                                                750,
+                                                animation.AnimationCurve.ELASTIC_IN_OUT),
+                                            selected_icon=Icons.BOOKMARK_ROUNDED,
+                                            icon_color=Colors.BLACK, selected_icon_color=Colors.BLACK54,
+                                            splash_color=Colors.BLACK,
+                                            style=ButtonStyle(
+                                                bgcolor=Colors.TRANSPARENT,
+                                                elevation=10,
+                                                overlay_color=Colors.BLACK38,
+                                                surface_tint_color=Colors.TRANSPARENT,
+                                            ),
                                         ),
-                                    )
-                                ],
-                                font_family="inter_light",
+                                    ],
+                                ),
+                                AnimatedSwitcher(
+                                    transition=AnimatedSwitcherTransition.FADE,
+                                    height=550,
+                                    data="Home",
+                                    reverse_duration=250,
+                                    duration=250, switch_in_curve=AnimationCurve.EASE_IN,
+                                    switch_out_curve=AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED,
+                                    content=self.content_home(),  # SearchWidget(e),
+                                ),
+                                Row(
+                                    alignment=MainAxisAlignment.CENTER,
+                                    vertical_alignment=CrossAxisAlignment.CENTER,
+                                    controls=[
+                                        Text(
+                                            spans=[
+                                                TextSpan(
+                                                    text="©",
+                                                    style=TextStyle(
+                                                        weight=FontWeight.W_500, color=Colors.BLACK,
+                                                        size=17,
+                                                        shadow=BoxShadow(spread_radius=8, blur_radius=1,
+                                                                         blur_style=ShadowBlurStyle.OUTER,
+                                                                         color=Colors.with_opacity(0.75,
+                                                                                                   Colors.BLACK),
+                                                                         offset=(0, .0023),
+                                                                         ),
+                                                    ),
+                                                ),
+                                                TextSpan(
+                                                    text="NH-CEN Group4 PROJECT",
+                                                    style=TextStyle(
+                                                        weight=FontWeight.W_500, color=Colors.BLACK,
+                                                        size=12,
+                                                        shadow=BoxShadow(spread_radius=0, blur_radius=0,
+                                                                         blur_style=ShadowBlurStyle.OUTER,
+                                                                         color=Colors.with_opacity(0.75,
+                                                                                                   Colors.BLACK),
+                                                                         offset=(0, .0023),
+                                                                         ),
+                                                    ),
+                                                )
+                                            ],
+                                            font_family="inter_light",
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                        IconButton(
+                            offset=(1, 0),
+                            data="right",
+                            left=500 - 64,
+                            top=e.page.window.height - e.page.window.height // 2 - 54 / 2,
+                            animate_offset=Animation(1750, AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
+                            icon_size=50,
+                            expand=False,
+                            on_click=self.__back,
+                            width=64, height=64,
+                            icon=Icons.CHEVRON_RIGHT_ROUNDED,
+                            style=ButtonStyle(
+                                shape=CircleBorder(),
+                                overlay_color=Colors.TRANSPARENT,
+                                surface_tint_color=Colors.BLACK45,
+                                bgcolor=Colors.with_opacity(0.0, Colors.WHITE),
+                                icon_color={ControlState.DEFAULT: "#26282e", ControlState.PRESSED: Colors.BLACK87},
                             ),
-                        ],
-                    ),
-                ],
+                        ),
+
+                        IconButton(
+                            offset=(-1.75, 0),
+                            left=0,
+                            data="left",
+                            top=e.page.window.height - e.page.window.height // 2 - 54 / 2,
+                            animate_offset=Animation(1750, AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
+                            icon_size=50,
+                            expand=False,
+                            on_click=self.__back,
+                            width=64, height=64,
+                            icon=Icons.CHEVRON_LEFT_ROUNDED,
+                            style=ButtonStyle(
+                                shape=CircleBorder(),
+                                overlay_color=Colors.TRANSPARENT,
+                                surface_tint_color=Colors.BLACK45,
+                                bgcolor=Colors.with_opacity(0.0, Colors.WHITE),
+                                icon_color={ControlState.DEFAULT: "#26282e", ControlState.PRESSED: Colors.BLACK87},
+                            ),
+                        ),
+                    ],
+                ),
             ),
         )
