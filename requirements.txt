@@ -1,0 +1,8 @@
+flet[all]==0.25.1
+pygame==2.6.1
+icecream==2.1.3
+edge-tts==6.1.14
+pillow==11.0.0
+english-words==2.0.1
+requests==2.32.3
+google-generativeai
