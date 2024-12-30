@@ -13,7 +13,7 @@ generation_config = {
     "max_output_tokens": 8192,
 }
 # gemini-1.5-flash-latest
-genai.configure(api_key="AIzaSyC7PNHeQPp1YI669gJwOuHJUA-WtEy6eQ8")
+genai.configure(api_key="your-gemini-api-key")
 model = genai.GenerativeModel("gemini-2.0-flash-exp", safety_settings=False,
                               # generation_config=generation_config
                               )
