@@ -87,8 +87,8 @@ The Dictionary App with AI Features is a powerful application that combines trad
 ### Steps to Run the App
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/username/dictionary-ai-app.git
-   cd dictionary-ai-app
+   git clone https://github.com/Dubemchukwu/Dictionary.git
+   cd Dictionary
    ```
 
 2. **Install Dependencies**:
