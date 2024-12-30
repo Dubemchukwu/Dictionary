@@ -59,20 +59,20 @@ The Dictionary App with AI Features is a powerful application that combines trad
 ## User Interface Design
 
 ### **Home Screen**
-![Home Screen](images/home_screen.png)
+![Home Screen](DataStudio/images/home_screen.png)
 - Search bar with AI-powered autocomplete.
 - "Word of the Day" section with a highlighted word and relevant image.
 - Quick links to Synonyms, Antonyms, and Bookmark features.
 
 ### **Word Detail Page**
-![Word Detail Page](images/word_detail_page.png)
+![Word Detail Page](DataStudio/images/word_detail_page.png)
 - Definition(s) of the word.
 - Relevant images for visual representation.
 - Synonyms and Antonyms.
 - Example sentences.
 
 ### **Bookmarks Page**
-![Bookmarks Page](images/bookmarks_page.png)
+![Bookmarks Page](DataStudio/images/bookmarks_page.png)
 - List of user-bookmarked words.
 - Options to remove or organize bookmarks.
 
