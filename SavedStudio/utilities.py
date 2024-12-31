@@ -24,21 +24,3 @@ class SaveUtils:
             data.reverse()
 
         return data
-
-
-DataStudio/constants.json
-DataStudio/dic_words.txt
-DataStudio/info.json
-DataStudio/recent.rec
-DataStudio/saved.json
-DataStudio/words.txt
-HomeStudio/main.py
-HomeStudio/search.py
-MiniStudio/main.py
-SavedStudio/main.py
-SavedStudio/utilities.py
-oconsole.spec
-requirements.txt
-run_script.py
-run_script.spec
-test.py
