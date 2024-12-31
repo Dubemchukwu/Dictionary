@@ -78,6 +78,8 @@ class UI:
     def __window_event(self, e: WindowEvent):
         if e.data == "blur":
             self.count = 0
+            if self.screen.route == "/":
+                threading.Thread(target=main_ai.AI().expand_window, kwargs={"app_ins": self}).start()
 
             if self.screen.route == "/.":
                 self.screen.views[-1].controls[0].width = 40
