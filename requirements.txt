@@ -6,3 +6,6 @@ pillow==11.0.0
 english-words==2.0.1
 requests==2.32.3
 google-generativeai
+PyAudio~=0.2.14
+numpy~=2.0.2
+pvporcupine~=3.0.3
