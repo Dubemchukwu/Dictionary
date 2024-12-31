@@ -54,6 +54,18 @@ class ApiCont:
         data = Daily_.get_state()
         if int(time.strftime("%d")) != int(data["date"]):
             Constants().set_daily_saved_state(False)
+
+            bookmark_button = \
+                screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                    -2].content.controls[
+                    -1].content.controls[0].controls[-1]
+
+            bookmark_button.selected = Constants().get_daily_saved_state()
+
+            screen.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+                -2].content.controls[
+                -1].content.controls[0].controls[-1].update()
+
             data["date"] = int(time.strftime("%d"))
             word_ = random.choice(list(Words().init()))
             cout(word_)
@@ -75,9 +87,8 @@ class ApiCont:
             #                                                                                 "").replace(
             # "{", "").replace("}", "").replace("|", "")
 
-            cout(response.json())
-            cout(response.json()[0]["fl"], response.json()[0]["shortdef"], response.status_code)
-            cout(data)
+            # cout(response.json()[0]["fl"], response.json()[0]["shortdef"], response.status_code)
+            # cout(data)
             Daily_.save_state(data)
 
         else:
@@ -118,7 +129,76 @@ class ApiCont:
 
         # cout(Variable._daily_word)
 
+
 class Constants:
+    animated_switcher = Ref[AnimatedSwitcher]()
+    searched_word = ""
+    notify_search_loading = SnackBar(
+        on_visible=lambda e: Constants.open_up_snack(e),
+        bgcolor=Colors.TRANSPARENT,
+        elevation=0, duration=3000,
+        behavior=SnackBarBehavior.FIXED,
+        dismiss_direction=DismissDirection.START_TO_END,
+        content=Row(
+            height=60,
+            alignment=MainAxisAlignment.CENTER,
+            controls=[
+                Container(
+                    width=150, height=30,
+                    scale=0, on_animation_end=lambda e: Constants.end_animation(e),
+                    animate_scale=Animation(1500, AnimationCurve.ELASTIC_OUT),
+                    animate=Animation(1000, AnimationCurve.ELASTIC_IN),
+                    shadow=[BoxShadow(
+                        spread_radius=1,
+                        color=Colors.ERROR,
+                        offset=(0, 1),
+                        blur_radius=1,
+                    ),
+                        BoxShadow(
+                            spread_radius=1,
+                            color=Colors.ERROR,
+                            offset=(0, 1),
+                            blur_radius=1,
+                        )
+                    ],
+                    border_radius=6,
+                    alignment=alignment.center,
+                    bgcolor=Colors.PRIMARY,
+                    content=Text("Search is loading", size=13, text_align=TextAlign.CENTER, weight=FontWeight.W_600,
+                                 color=Colors.ON_PRIMARY),
+                ),
+            ],
+        ),
+    )
+
+    @staticmethod
+    def open_up_snack(e: ControlEvent):
+        e.control.content.controls[0].scale = 1.05
+        e.control.content.controls[0].update()
+
+    @staticmethod
+    def end_animation(e: ControlEvent):
+        e.control.scale = 1
+        e.control.update()
+
+    @staticmethod
+    def change_theme(e: ControlEvent):
+        if e.page.theme_mode == ThemeMode.LIGHT:
+            e.control.segments[0].icon.name = Icons.WB_SUNNY_OUTLINED
+            e.control.segments[1].icon.name = Icons.DARK_MODE_ROUNDED
+            e.page.theme_mode = ThemeMode.DARK
+            e.control.update()
+            if Constants.animated_switcher.current.content.data == "markdown_parent":
+                VariableSearch.markdown.current.code_theme = MarkdownCodeTheme.DARK
+        else:
+            e.control.segments[0].icon.name = Icons.WB_SUNNY_ROUNDED
+            e.control.segments[1].icon.name = Icons.DARK_MODE_OUTLINED
+            e.control.update()
+            if Constants.animated_switcher.current.content.data == "markdown_parent":
+                VariableSearch.markdown.current.code_theme = MarkdownCodeTheme.LIGHTFAIR
+            e.page.theme_mode = ThemeMode.LIGHT
+        e.page.update()
+
     def __init__(self):
         pass
 
@@ -135,7 +215,6 @@ class Constants:
         with open("DataStudio/constants.json", "w") as file:
             json.dump(data, file)
 
-
     def get_daily_saved_state(self) -> bool:
         try:
             with open("DataStudio/constants.json", "r") as file:
@@ -151,27 +230,77 @@ class Constants:
                 ...
             return False
 
+    def get_search_saved_state(self, word) -> bool:
+        # checked: bool = False
+        with open("DataStudio/saved.json", "r") as file:
+            data = json.load(file)
+        for block in data:
+            if word in block.values():
+                cout(word)
+                return True
+        return False
+
+
 class Variable:
     see_all_state = False
     counts = 0
+    searched_word = ""
 
     def __init__(self):
         self.main_list = []
         self.remainder_list = []
+
+    def save_search_bookmark(self):
+        with open("DataStudio/saved.json", "r") as file:
+            data: list = json.load(file)
+
+        data.append(alt.search_result)
+
+        with open("DataStudio/saved.json", "w") as file:
+            json.dump(data, file)
+
+    def delete_search_bookmark(self):
+        with open("DataStudio/saved.json", "r") as file:
+            data: list = json.load(file)
+
+        for _ in data:
+            if _.get("word") == alt.search_result.get("word"):
+                data.remove(_)
+
+                with open("DataStudio/saved.json", "w") as file:
+                    json.dump(data, file)
+
+    def _save_search(self, e: ControlEvent):
+        if alt.to_save_state:
+            cout(alt.search_result)
+            e.control.rotate += math.pi * 2
+            e.control.selected = True if e.control.selected == False else False
+            e.control.update()
+            if e.control.selected:
+                self.save_search_bookmark()
+            else:
+                self.delete_search_bookmark()
+        else:
+            Constants.notify_search_loading.open = True
+            Constants.notify_search_loading.update()
+            cout("search can't be saved while, it's still loading")
 
     @staticmethod
     def delete_bookmark(data: dict):
         [data.pop(key) for key in ["date", "check"]]
         with open("DataStudio/saved.json", "r") as file:
             full_data: list = json.load(file)
-
-        full_data.remove(data)
+        if data in full_data:
+            full_data.remove(data)
+        else:
+            ...
 
         with open("DataStudio/saved.json", "w") as file:
             json.dump(full_data, file)
 
     @staticmethod
     def save_bookmark(data: dict):
+        cout(data)
         [data.pop(key) for key in ["date", "check"]]
         full_data: list = []
         try:
@@ -194,14 +323,45 @@ class Variable:
         e.control.update()
 
     def _refreshing_all(self, e: ControlEvent):
-        e.page.views[1].controls[0].content = None
-        e.page.views[1].controls[0].content = Home()._content_(e)
-        e.page.views[1].controls[0].update()
+        # home_view_temp = e.page.views[-1]
+        # e.page.views.pop()
+        # e.page.views.append(
+        #     home_view_temp,
+        # )
+        # e.page.update()
+        e.data = Variable.searched_word
+        if e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[0].data == "home_content":
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = None
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = Home().content_home()
+        elif e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[0].data == "markdown_parent":
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = None
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
+
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].update()
         cout("refreshed")
 
     def create_history(self, wordz):
-        with open("DataStudio/recent.rec", "a") as recent:
-            recent.write(wordz + ",")
+        with open("DataStudio/recent.rec", "r") as file:
+            data = file.read()
+        _data_ = data.split(",")
+        _data_.pop()
+        _data_.reverse()
+        if wordz not in _data_:
+            if len(_data_) == 12:
+                data = data.replace(_data_[-1] + ",", "")
+                data = data + wordz + ","
+                with open("DataStudio/recent.rec", "w") as file:
+                    file.write(data)
+                cout(data)
+            else:
+                with open("DataStudio/recent.rec", "a") as recent:
+                    recent.write(wordz + ",")
+        else:
+            data = data.replace(wordz + ",", "")
+            data = data + wordz + ","
+            with open("DataStudio/recent.rec", "w") as file:
+                file.write(data)
+            cout(data)
 
     def list_history(self):
         self.checking = 0
@@ -243,9 +403,9 @@ class daily_word:
         e.control.update()
         Constants().set_daily_saved_state(e.control.selected)
         if e.control.selected:
-            Variable.save_bookmark(e.control.data)
+            Variable.save_bookmark(Daily_.get_state())
         else:
-            Variable.delete_bookmark(e.control.data)
+            Variable.delete_bookmark(Daily_.get_state())
 
     def _end_save_(self, e: ControlEvent):
         e.control.scale = 1
@@ -330,7 +490,6 @@ class daily_word:
                                         IconButton(
                                             icon=Icons.BOOKMARK_OUTLINE_ROUNDED,
                                             scale=1,
-                                            data=Daily_.get_state(),
                                             selected=Constants().get_daily_saved_state(),
                                             icon_size=30, splash_radius=10,
                                             splash_color=Colors.WHITE,
@@ -411,7 +570,7 @@ class history(Container):
                         height=20,
                         width=60,
                         size=16,
-                        color="#434343",
+                        color=Colors.ON_PRIMARY,
                     ),
                     on_click=lambda e: self.__search_word__(e),
                 ),
@@ -420,7 +579,7 @@ class history(Container):
                     scale=1.1,
                     data=[text_, Variable.counts],
                     on_click=lambda e: self.__delete(e),
-                    icon_color="#1b1b1b",
+                    icon_color=Colors.ON_PRIMARY,
                     icon_size=15,
                 )
             ],
@@ -428,29 +587,33 @@ class history(Container):
         self.width = 103
         self.height = 30
         self.border_radius = border_radius.all(20)
-        self.bgcolor = "#d9d9d9"
+        self.bgcolor = Colors.ON_SECONDARY_CONTAINER
         Variable.counts += 1
 
     def __search_word__(self, e: ControlEvent):
+        SearchWidget._state_ = True
         e.data = e.control.content.value
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+        Constants.searched_word = e.data
+        Variable.searched_word = e.data
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
             1].value = e.data
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].data = "Search"
-        saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].data = "Search"
 
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = True
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[
+            1].selected = Constants().get_search_saved_state(e.data)
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = True
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
 
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
-        e.page.views[1].controls[0].content.content.content.controls[0].update()
-        cout(e.data)
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
+        e.page.views[-1].controls[0].content.content.content.controls[0].update()
+        cout(e.data, "recently searched")
 
     def __delete(self, e: ControlEvent):
-        with open("recent.rec", "r") as file:
+        with open("DataStudio/recent.rec", "r") as file:
             file_data = file.read()
             file_data = file_data.replace(e.control.data[0] + ",", "")
 
-        with open("recent.rec", "w") as file:
+        with open("DataStudio/recent.rec", "w") as file:
             file.write(file_data)
             cout(file_data)
 
@@ -465,23 +628,23 @@ class history(Container):
         #
         # e.page.views[-1].controls[0].content.content.content.controls[3].content.controls[0].content.controls[2].update()
         if Variable.see_all_state:
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].controls = Home()._add_history(
                 Variable().list_history()[0] + Variable().list_history()[1],
             )
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].height = (38 * math.ceil(len(Variable().list_history()[0] + Variable().list_history()[1]) / 4))
             cout("Debug: deleting")
         else:
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].controls = Home()._add_history(
                 Variable().list_history()[0],
             )
 
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
             0].content.controls[2].update()
         cout("deleted successfully")
 
@@ -502,11 +665,11 @@ class Home:
                 word = match
 
         if "." in word or len(word) == 1:
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
                 0].value = ""
             # e.page.helper_text = ""
         else:
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
                 0].value = word.lower()
             self.__complete_text = word.lower()
             cout(word.lower())
@@ -514,17 +677,37 @@ class Home:
         e.page.update()
         e.control.update()
 
+    def __remove_label(self, e: ControlEvent):
+        e.control.value = ""
+        e.control.update()
+
+    def __add_label_thread(self, e: ControlEvent):
+        for i in "Type Here":
+            e.control.value += i
+            e.control.update()
+            time.sleep(0.25)
+
+    def __add_label(self, e: ControlEvent):
+        if e.control.value == "" or e.control.value.lower == "type here":
+            self.__add_label_thread(e)
+        # self.label_thread = threading.Thread(target=self.__add_label_thread, kwargs={"e": e})
+        # self.label_thread.start()
+
     def __search_word(self, e: ControlEvent):
         if e.data != "" or e.data.isspace() is False:
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].data = "Search"
+            SearchWidget._state_ = True
+            Variable.searched_word = e.data
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].data = "Search"
             saving = threading.Thread(target=Variable().create_history, kwargs={"wordz": e.data})
             saving.start()
 
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = True
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[
+                1].selected = Constants().get_search_saved_state(e.data)
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = True
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
 
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
-            e.page.views[1].controls[0].content.content.content.controls[0].update()
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = SearchWidget(e)
+            e.page.views[-1].controls[0].content.content.content.controls[0].update()
             cout(e.data)
 
     def _add_history(self, array):
@@ -540,11 +723,11 @@ class Home:
 
     def __expand_hist(self, e: ControlEvent):
         if e.control.text == "see all":
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].height = (38 * math.ceil(len(Variable().list_history()[0] + Variable().list_history()[1]) / 4))
 
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].controls.extend(
                 self._add_history(
@@ -554,36 +737,36 @@ class Home:
             e.control.text = "Shrink"
 
         else:
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].expand = False
 
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].height = 38
 
             e.control.text = "see all"
-            e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+            e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                 0].content.controls[
                 2].controls = self._add_history(
                 Variable().list_history()[0],
             )
             Variable.see_all_state = False
 
-        cout(len(e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+        cout(len(e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
                      0].content.controls[
                      2].controls))
 
         cout(e.data, "clicked")
         e.control.update()
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].content.controls[
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content.controls[
             0].content.controls[2].update()
         cout(Variable.see_all_state)
 
     def content_home(self):
         return Column(
             alignment=MainAxisAlignment.SPACE_EVENLY,
-            spacing=0, run_spacing=0, tight=True,
+            spacing=0, run_spacing=0, tight=True, data="home_content",
             height=430,
             controls=[
                 Container(
@@ -593,7 +776,7 @@ class Home:
                         spacing=0, run_spacing=0, tight=True,
                         # height=100,
                         controls=[
-                            Text("Recently Searched", size=18, color="#000000", font_family="roboto"),
+                            Text("Recently Searched", size=18, color=Colors.ON_PRIMARY, font_family="roboto"),
                             TransparentPointer(height=10),
                             GridView(
                                 animate_size=animation.Animation(750,
@@ -616,10 +799,10 @@ class Home:
                                         text="see all",
                                         on_click=lambda e: self.__expand_hist(e),
                                         style=ButtonStyle(
-                                            color={ControlState.DEFAULT: "#292929",
+                                            color={ControlState.DEFAULT: Colors.ON_PRIMARY,
                                                    ControlState.HOVERED: "#d9d9d9",
                                                    ControlState.PRESSED: "#404040"},
-                                            bgcolor=Colors.WHITE,
+                                            bgcolor=Colors.PRIMARY,
                                             shape=BeveledRectangleBorder(1),
                                             overlay_color=Colors.TRANSPARENT,  # "#404040",
                                             surface_tint_color=Colors.BLACK,
@@ -659,15 +842,15 @@ class Home:
                 e.control.content.controls[-2].update()
 
     def __back(self, e: ControlEvent):
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = False
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[1].visible = False
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[1].update()
 
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
             0].value = ""
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[0].controls[
             1].value = ""
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[2].controls[0].update()
-        e.page.views[1].controls[0].content.content.content.controls[0].controls[3].data = "Home"
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[2].controls[0].update()
+        e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].data = "Home"
         e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].content = self.content_home()
         e.page.views[-1].controls[0].content.content.content.controls[0].controls[3].update()
         if e.control.data == "left":
@@ -716,13 +899,13 @@ class Home:
                                                          ),
 
                                                 TextSpan("icti",
-                                                         style=TextStyle(color=Colors.BLACK),
+                                                         style=TextStyle(color=Colors.ON_PRIMARY),
                                                          ),
                                                 TextSpan("o",
                                                          style=TextStyle(color="#9d0208"),
                                                          ),
                                                 TextSpan("nary",
-                                                         style=TextStyle(color=Colors.BLACK),
+                                                         style=TextStyle(color=Colors.ON_PRIMARY),
                                                          ),
                                             ],
                                             font_family="krona_one",
@@ -748,11 +931,11 @@ class Home:
                                                     on_click=lambda e: Variable().refresh_all(e),
                                                     on_animation_end=lambda e: Variable()._refreshing_all(e),
                                                     icon_size=30,
-                                                    icon_color=Colors.BLACK,
+                                                    icon_color=Colors.ON_PRIMARY,
                                                 ),
                                                 PopupMenuButton(
                                                     tooltip="",
-                                                    bgcolor="#e3e3e3",
+                                                    bgcolor=Colors.PRIMARY_CONTAINER,
                                                     size_constraints=BoxConstraints(min_width=110, max_width=110),
                                                     rotate=0,
                                                     animate_rotation=Animation(1000,
@@ -770,7 +953,7 @@ class Home:
                                                     surface_tint_color=Colors.TRANSPARENT,
                                                     icon=Icons.MORE_HORIZ_ROUNDED,
                                                     icon_size=30,
-                                                    icon_color=Colors.BLACK,
+                                                    icon_color=Colors.ON_PRIMARY,
                                                     items=[
                                                         PopupMenuItem(
                                                             content=Row(
@@ -780,28 +963,29 @@ class Home:
                                                                         width=90,
                                                                         height=40,
                                                                         style=ButtonStyle(
-                                                                            bgcolor={ControlState.SELECTED: "#999999",
-                                                                                     ControlState.DEFAULT: "#d9d9d9"},
+                                                                            color=Colors.TRANSPARENT,
+                                                                            bgcolor=Colors.TRANSPARENT,
+                                                                            overlay_color=Colors.TRANSPARENT,
                                                                         ),
                                                                         show_selected_icon=False,
-                                                                        selected={"light"},
+                                                                        selected={e.theme_mode.value} if type(e) != ControlEvent else {e.page.theme_mode.value},
                                                                         allow_empty_selection=False,
                                                                         allow_multiple_selection=False,
-                                                                        on_change=lambda e: cout(
-                                                                            list(e.control.selected)[0]),
+                                                                        data="markdown",
+                                                                        on_change=lambda e: Constants.change_theme(e),
                                                                         segments=[
                                                                             Segment(
                                                                                 value="light",
                                                                                 icon=Icon(
-                                                                                    name=Icons.SUNNY,
-                                                                                    size=20, color=Colors.BLACK,
+                                                                                    name=Icons.WB_SUNNY_ROUNDED if (e.theme_mode.value if type(e) != ControlEvent else e.page.theme_mode.value) == "light" else Icons.WB_SUNNY_OUTLINED,
+                                                                                    size=20, color=Colors.ON_PRIMARY,
                                                                                 ),
                                                                             ),
                                                                             Segment(
                                                                                 value="dark",
                                                                                 icon=Icon(
-                                                                                    name=Icons.SHIELD_MOON_ROUNDED,
-                                                                                    size=20, color=Colors.BLACK,
+                                                                                    name=Icons.DARK_MODE_ROUNDED if (e.theme_mode.value if type(e) != ControlEvent else e.page.theme_mode.value) == "dark" else Icons.DARK_MODE_OUTLINED,
+                                                                                    size=20, color=Colors.ON_PRIMARY,
                                                                                 ),
                                                                             ),
                                                                         ],
@@ -821,7 +1005,7 @@ class Home:
                                                                         font_family="spartan",
                                                                         weight=FontWeight.W_800,
                                                                         size=20,
-                                                                        color="#1d3557",
+                                                                        color=Colors.ON_PRIMARY,
                                                                     ),
                                                                 ],
                                                             ),
@@ -883,12 +1067,14 @@ class Home:
                                                 ),
 
                                                 TextField(
+                                                    on_blur=lambda e: self.__add_label(e),
+                                                    on_focus=lambda e: self.__remove_label(e),
                                                     on_submit=lambda e: self.__search_word(e),
                                                     on_change=lambda e: self.__update_suggestions(e),
                                                     counter_style=TextStyle(
                                                         size=15, color="#666666",
                                                         font_family="roboto",
-                                                    ),
+                                                    ), value="Type Here",
                                                     content_padding=padding.only(right=17.0, left=25.0),
                                                     width=360, hint_text="Type Here",
                                                     hint_style=TextStyle(
@@ -915,16 +1101,20 @@ class Home:
                                         IconButton(
                                             icon=Icons.BOOKMARK_OUTLINE_ROUNDED,
                                             visible=False,
-                                            rotate=0,
+                                            scale=1, rotate=0,
+                                            selected=Constants().get_search_saved_state(Constants.searched_word),
                                             icon_size=30, splash_radius=4,
-                                            on_click=lambda e: daily_word()._save_(e),
+                                            on_click=lambda e: Variable()._save_search(e),
                                             on_animation_end=lambda e: daily_word()._end_save_(e),
+                                            animate_scale=animation.Animation(
+                                                550,
+                                                animation.AnimationCurve.ELASTIC_OUT),
                                             animate_rotation=animation.Animation(
-                                                750,
-                                                animation.AnimationCurve.ELASTIC_IN_OUT),
+                                                550,
+                                                animation.AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
                                             selected_icon=Icons.BOOKMARK_ROUNDED,
-                                            icon_color=Colors.BLACK, selected_icon_color=Colors.BLACK54,
-                                            splash_color=Colors.BLACK,
+                                            icon_color=Colors.ON_PRIMARY, selected_icon_color=Colors.ON_PRIMARY,
+                                            splash_color=Colors.PRIMARY,
                                             style=ButtonStyle(
                                                 bgcolor=Colors.TRANSPARENT,
                                                 elevation=10,
@@ -935,6 +1125,7 @@ class Home:
                                     ],
                                 ),
                                 AnimatedSwitcher(
+                                    ref=Constants.animated_switcher,
                                     transition=AnimatedSwitcherTransition.FADE,
                                     height=550,
                                     data="Home",
@@ -948,11 +1139,11 @@ class Home:
                                     vertical_alignment=CrossAxisAlignment.CENTER,
                                     controls=[
                                         Text(
-                                            spans=[
+                                             spans=[
                                                 TextSpan(
                                                     text="©",
                                                     style=TextStyle(
-                                                        weight=FontWeight.W_500, color=Colors.BLACK,
+                                                        weight=FontWeight.W_500, color=Colors.ON_PRIMARY,
                                                         size=17,
                                                         shadow=BoxShadow(spread_radius=8, blur_radius=1,
                                                                          blur_style=ShadowBlurStyle.OUTER,
@@ -965,7 +1156,7 @@ class Home:
                                                 TextSpan(
                                                     text="NH-CEN Group4 PROJECT",
                                                     style=TextStyle(
-                                                        weight=FontWeight.W_500, color=Colors.BLACK,
+                                                        weight=FontWeight.W_500, color=Colors.ON_PRIMARY,
                                                         size=12,
                                                         shadow=BoxShadow(spread_radius=0, blur_radius=0,
                                                                          blur_style=ShadowBlurStyle.OUTER,
@@ -986,7 +1177,7 @@ class Home:
                             offset=(1, 0),
                             data="right",
                             left=500 - 64,
-                            top=e.page.window.height - e.page.window.height // 2 - 54 / 2,
+                            top=(e.window.height  if type(e) != ControlEvent else e.page.window.height) - (e.window.height  if type(e) != ControlEvent else e.page.window.height) // 2 - 54 / 2,
                             animate_offset=Animation(1750, AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
                             icon_size=50,
                             expand=False,
@@ -998,7 +1189,8 @@ class Home:
                                 overlay_color=Colors.TRANSPARENT,
                                 surface_tint_color=Colors.BLACK45,
                                 bgcolor=Colors.with_opacity(0.0, Colors.WHITE),
-                                icon_color={ControlState.DEFAULT: "#26282e", ControlState.PRESSED: Colors.BLACK87},
+                                icon_color={ControlState.DEFAULT: Colors.ON_PRIMARY,
+                                            ControlState.PRESSED: Colors.BLACK87},
                             ),
                         ),
 
@@ -1006,7 +1198,7 @@ class Home:
                             offset=(-1.75, 0),
                             left=0,
                             data="left",
-                            top=e.page.window.height - e.page.window.height // 2 - 54 / 2,
+                            top=(e.window.height  if type(e) != ControlEvent else e.page.window.height) - (e.window.height  if type(e) != ControlEvent else e.page.window.height) // 2 - 54 / 2,
                             animate_offset=Animation(1750, AnimationCurve.EASE_IN_OUT_CUBIC_EMPHASIZED),
                             icon_size=50,
                             expand=False,
@@ -1018,7 +1210,8 @@ class Home:
                                 overlay_color=Colors.TRANSPARENT,
                                 surface_tint_color=Colors.BLACK45,
                                 bgcolor=Colors.with_opacity(0.0, Colors.WHITE),
-                                icon_color={ControlState.DEFAULT: "#26282e", ControlState.PRESSED: Colors.BLACK87},
+                                icon_color={ControlState.DEFAULT: Colors.ON_PRIMARY,
+                                            ControlState.PRESSED: Colors.BLACK87},
                             ),
                         ),
                     ],

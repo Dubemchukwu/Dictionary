@@ -4,11 +4,61 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.4 -&gt; fixed the search result User Interface.">
+    <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality.">
+      <change afterPath="$PROJECT_DIR$/AIStudio/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AIStudio/test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AIStudio/wakeup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataStudio/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataStudio/dic_words.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataStudio/info.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataStudio/recent.rec" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataStudio/words.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HomeStudio/search.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HomeStudio/security_experiment.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SavedStudio/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SavedStudio/utilities.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SavedStudio/view.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run_script.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HomeStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/HomeStudio/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MiniStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MiniStudio/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info.json" beforeDir="false" afterPath="$PROJECT_DIR$/info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-BoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraBold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraBoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraLight.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraLightItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Italic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Light.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-LightItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Medium.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-MediumItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-SemiBold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-SemiBoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Thin.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ThinItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-BoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraBold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraLight.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Italic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Light.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-LightItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Medium.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-MediumItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-SemiBold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Thin.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ThinItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recent.rec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,26 +90,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run_script.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/DUBEM/Desktop/PROJECT_CODE/Projects/csc_chat_app&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.main.executor": "Run",
+    "Python.python main.py.executor": "Run",
+    "Python.run_script.executor": "Run",
+    "Python.security_experiment.executor": "Run",
+    "Python.test.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/DUBEM/Desktop/New Horizon/Dictionary/HomeStudio"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\DUBEM\Desktop\New Horizon\Dictionary\HomeStudio" />
+      <recent name="C:\Users\DUBEM\Desktop\New Horizon\Dictionary\AIStudio" />
       <recent name="C:\Users\DUBEM\Desktop\New Horizon\Dictionary\assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\DUBEM\Desktop\New Horizon\Dictionary\DataStudio" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="python main.py" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.security_experiment">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Dictionary" />
       <option name="ENV_FILES" value="" />
@@ -82,6 +141,56 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="python main.py" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Dictionary" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="security_experiment" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Dictionary" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/HomeStudio" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/HomeStudio/security_experiment.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.security_experiment" />
+        <item itemvalue="Python.python main.py" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -163,7 +272,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732868479090</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality.">
+      <option name="closed" value="true" />
+      <created>1734300338911</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1734300338911</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -193,6 +310,7 @@
     <MESSAGE value="Dictionary 0.0.1" />
     <MESSAGE value="Dictionary 0.0.3 -&gt; fixed time issues and working on search page" />
     <MESSAGE value="Dictionary 0.0.4 -&gt; fixed the search result User Interface." />
-    <option name="LAST_COMMIT_MESSAGE" value="Dictionary 0.0.4 -&gt; fixed the search result User Interface." />
+    <MESSAGE value="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality." />
+    <option name="LAST_COMMIT_MESSAGE" value="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality." />
   </component>
 </project>
