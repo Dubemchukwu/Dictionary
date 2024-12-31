@@ -1,0 +1,2 @@
+*.large-file-extension filter=lfs diff=lfs merge=lfs -text
+*.largefileextension filter=lfs diff=lfs merge=lfs -text
