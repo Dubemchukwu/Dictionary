@@ -4,61 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality.">
-      <change afterPath="$PROJECT_DIR$/AIStudio/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AIStudio/test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AIStudio/wakeup.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DataStudio/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DataStudio/dic_words.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DataStudio/info.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DataStudio/recent.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DataStudio/words.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HomeStudio/search.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HomeStudio/security_experiment.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SavedStudio/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SavedStudio/utilities.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SavedStudio/view.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/run_script.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="75deecd0-0ea1-4f8a-8119-881996478524" name="Changes" comment="Dictionary 0.0.8 -&gt; improved security, added wakeup word feature">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HomeStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/HomeStudio/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MiniStudio/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MiniStudio/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Bold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-BoldItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraBold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraBoldItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraLight.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ExtraLightItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Italic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Light.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-LightItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Medium.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-MediumItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Regular.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-SemiBold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-SemiBoldItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-Thin.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMono-ThinItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Bold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-BoldItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraBold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraLight.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Italic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Light.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-LightItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Medium.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-MediumItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Regular.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-SemiBold.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-Thin.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ttf/JetBrainsMonoNL-ThinItalic.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/info.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/recent.rec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +20,9 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/HomeStudio/main.py" root0="FORCE_HIGHLIGHTING" />
@@ -280,7 +229,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734300338911</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Dictionary 0.0.8 -&gt; improved security, added wakeup word feature">
+      <option name="closed" value="true" />
+      <created>1735624777044</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1735624777044</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -311,6 +268,7 @@
     <MESSAGE value="Dictionary 0.0.3 -&gt; fixed time issues and working on search page" />
     <MESSAGE value="Dictionary 0.0.4 -&gt; fixed the search result User Interface." />
     <MESSAGE value="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality." />
-    <option name="LAST_COMMIT_MESSAGE" value="Dictionary 0.0.4 -&gt; fixed the search result User Interface, linked the pages together, implemented part of the save or bookmark functionality." />
+    <MESSAGE value="Dictionary 0.0.8 -&gt; improved security, added wakeup word feature" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dictionary 0.0.8 -&gt; improved security, added wakeup word feature" />
   </component>
 </project>
